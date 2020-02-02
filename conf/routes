@@ -11,4 +11,4 @@ GET     /assets/*file               controllers.Assets.versioned(path="/public",
 GET     /hello      controllers.HomeController.hello(name: String)
 
 GET     /steamLogin     controllers.SteamLoginController.login(request: Request)
-GET     /callBack     controllers.SteamLoginController.callBack()
+GET     /callBack     controllers.SteamLoginController.callBack(request: Request)

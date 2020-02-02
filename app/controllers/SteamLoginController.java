@@ -1,6 +1,7 @@
 package controllers;
 
 import play.libs.openid.OpenIdClient;
+import play.libs.openid.UserInfo;
 import play.mvc.*;
 
 import javax.inject.Inject;
@@ -13,8 +14,6 @@ public class SteamLoginController extends Controller {
 
     public CompletionStage<Result> login(Http.Request request) {
 
-
-
         CompletionStage<String> redirectUrlPromise =
                 openIdClient.redirectURL(
                         "https://steamcommunity.com/openid", routes.SteamLoginController.callBack().absoluteURL(request));
@@ -24,7 +23,9 @@ public class SteamLoginController extends Controller {
 //                .exceptionally(throwable -> badRequest(views.html.login.render(throwable.getMessage())));
     }
 
-    public Result callBack() {
-        return ok();
+    public CompletionStage<Result> callBack(Http.Request request) {
+        return openIdClient.verifiedId(request)
+                .thenApply(userInfo -> ok(views.html.hello.render(userInfo.id())))
+                .exceptionally(throwable -> badRequest(views.html.hello.render(throwable.getMessage())));
     }
 }
