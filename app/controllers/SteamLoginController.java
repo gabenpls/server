@@ -17,11 +17,11 @@ public class SteamLoginController extends Controller {
 
         CompletionStage<String> redirectUrlPromise =
                 openIdClient.redirectURL(
-                        "https://steamcommunity.com/openid" , routes.SteamLoginController.callBack().absoluteURL(request));
+                        "https://steamcommunity.com/openid", routes.SteamLoginController.callBack().absoluteURL(request));
 
         return redirectUrlPromise
-                .thenApply(Controller::redirect)
-                .exceptionally(throwable -> badRequest(views.html.login.render(throwable.getMessage())));
+                .thenApply(Controller::redirect);
+//                .exceptionally(throwable -> badRequest(views.html.login.render(throwable.getMessage())));
     }
 
     public Result callBack() {
