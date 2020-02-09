@@ -9,5 +9,6 @@ scalaVersion := "2.13.1"
 
 libraryDependencies ++= Seq(
   guice,
-  openId
+  openId,
+  javaWs
 )
