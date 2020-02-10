@@ -3,7 +3,7 @@
 <nav class="navbar is-primary" role="navigation" aria-label="main navigation">
     <div class="navbar-brand">
         <a class="navbar-item" href="/">
-            <img src=@{ if (avatarUrl == null) "/assets/images/favicon.png" else avatarUrl} width="28" height="28">
+            <img src=@{ if (avatarUrl== null) "/assets/images/gaben.png" else avatarUrl} width="28" height="28">
             <div class="navbar-brand-text">GABENPLS</div>
         </a>
     </div>
@@ -20,13 +20,13 @@
 
         <div class="navbar-end">
             @{ if (avatarUrl != null)
-                <div class="navbar-item">
-                    <div class="buttons">
-                        <a class="button is-light" href="/steamLogout">
-                            Log out
-                        </a>
-                    </div>
+            <div class="navbar-item">
+                <div class="buttons">
+                    <a class="button is-light" href="/steamLogout">
+                        Log out
+                    </a>
                 </div>
+            </div>
             }
         </div>
     </div>
