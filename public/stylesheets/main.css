@@ -9,3 +9,7 @@
     border-radius: 6px;
     color: #586e75;
 }
+
+.big-logo {
+    max-height: 3rem !important;
+}
