@@ -5,19 +5,14 @@
 version: 2
 jobs:
   build:
+    branches:
+      only:
+        - master
+        -
     docker:
-      # specify the version you desire here
       - image: circleci/openjdk:11-jdk
 
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/postgres:9.4
-
-    working_directory: ~
-
     environment:
-      # Customize the JVM maximum heap limit
       JVM_OPTS: -Xmx3200m
 
     steps:
@@ -29,6 +24,10 @@ jobs:
             - v1-dependencies-{{ checksum "build.sbt" }}
             # fallback to using the latest cache if no exact match is found
             - v1-dependencies-
+
+      - add_ssh_keys:
+          fingerprints:
+            - "11:9e:77:09:1e:92:0e:4b:df:44:6a:2b:30:c2:cb:8d"
 
       - run: cat /dev/null | ./scripts/deploy.sh
 
