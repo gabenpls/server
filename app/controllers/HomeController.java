@@ -1,6 +1,8 @@
 package controllers;
 
 import clients.SteamClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import play.mvc.*;
 
 import javax.inject.Inject;
@@ -17,6 +19,7 @@ public class HomeController extends Controller {
 
     @Inject
     SteamClient steamClient;
+    final Logger log = LoggerFactory.getLogger(this.getClass());
 
     /**
      * An action that renders an HTML page with a welcome message.
@@ -28,6 +31,7 @@ public class HomeController extends Controller {
         Optional<String> optSteamId = request.session()
                 .get(SteamLoginController.STEAM_ID_NAME);
         if (optSteamId.isPresent()) {
+            log.info(optSteamId.toString());
             return steamClient.getAvatar(optSteamId.get()).thenApply(avatarUrl -> {
                 return ok(views.html.hello.render(avatarUrl));
             });

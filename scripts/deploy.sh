@@ -2,7 +2,6 @@
 
 set -e
 
-sbt dist
-rm -r target/universal/server-1.0-SNAPSHOT
-unzip target/universal/server-1.0-SNAPSHOT.zip -d target/universal
-rsync target/universal/server-1.0-SNAPSHOT/ root@167.172.101.7:~/dist/ -v -r --update
+sbt debian:packageBin
+rsync target/server_1.0-SNAPSHOT_all.deb root@167.172.101.7:~/ -v -r --update
+ssh root@167.172.101.7 "dpkg -i server_1.0-SNAPSHOT_all.deb && service server restart"

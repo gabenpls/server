@@ -4,7 +4,7 @@ maintainer := "mcsim1993@gmail.com"
 
 version := "1.0-SNAPSHOT"
 
-lazy val root = (project in file(".")).enablePlugins(PlayJava, DebianPlugin)
+lazy val root = (project in file(".")).enablePlugins(PlayJava, DebianPlugin, SystemdPlugin)
 
 scalaVersion := "2.13.1"
 javacOptions ++= Seq("-source", "11", "-target", "11")
