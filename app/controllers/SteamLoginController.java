@@ -5,11 +5,13 @@ import play.libs.openid.UserInfo;
 import play.mvc.*;
 
 import javax.inject.Inject;
+import java.util.Optional;
 import java.util.concurrent.CompletionStage;
 
 public class SteamLoginController extends Controller {
 
     public static final String STEAM_ID_NAME = "steam_id";
+
 
     @Inject
     OpenIdClient openIdClient;
@@ -45,4 +47,5 @@ public class SteamLoginController extends Controller {
                 })
                 .exceptionally(throwable -> badRequest(views.html.hello.render(throwable.getMessage())));
     }
+
 }
