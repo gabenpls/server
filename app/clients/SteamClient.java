@@ -3,6 +3,8 @@ package clients;
 import javax.inject.Inject;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import model.GameSchema;
+import model.PlayerSummaries;
 import play.libs.ws.*;
 
 import java.util.concurrent.CompletionStage;
@@ -16,7 +18,7 @@ public class SteamClient implements WSBodyReadables, WSBodyWritables {
         this.ws = ws;
     }
 
-    public CompletionStage<String> getAvatar(String steamId) {
+    public CompletionStage<PlayerSummaries> getPlayerSummaries(String steamId) {
         WSRequest request = ws.url("http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/")
                 .addQueryParameter("key", STEAM_KEY)
                 .addQueryParameter("steamids", steamId);
@@ -24,7 +26,7 @@ public class SteamClient implements WSBodyReadables, WSBodyWritables {
 
         return responsePromise.thenApply(response -> {
             JsonNode jsBody = response.getBody(json());
-            return jsBody.get("response").get("players").get(0).get("avatarfull").asText();
+            return PlayerSummaries.parseFrom(jsBody);
         });
     }
 
@@ -44,7 +46,7 @@ public class SteamClient implements WSBodyReadables, WSBodyWritables {
         });
     }
 
-    public CompletionStage<JsonNode> getSchemaForGame(String gameId) {
+    public CompletionStage<GameSchema> getSchemaForGame(String gameId) {
         WSRequest request = ws.url("http://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2/")
                 .addQueryParameter("appid", gameId)
                 .addQueryParameter("key", STEAM_KEY);
@@ -54,7 +56,7 @@ public class SteamClient implements WSBodyReadables, WSBodyWritables {
             if (response.getStatus() != 200) {
                 throw new IllegalStateException("wrong status from steamApi");
             }
-            return response.getBody(json());
+            return GameSchema.parseFrom(response.getBody(json()), Integer.parseInt(gameId));
         });
     }
 

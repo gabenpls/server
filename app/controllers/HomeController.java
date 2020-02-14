@@ -31,14 +31,12 @@ public class HomeController extends Controller {
         Optional<String> optSteamId = request.session()
                 .get(SteamLoginController.STEAM_ID_NAME);
         if (optSteamId.isPresent()) {
-            return steamClient.getAvatar(optSteamId.get()).thenApply(avatarUrl -> {
-                return ok(views.html.hello.render(avatarUrl));
+            return steamClient.getPlayerSummaries(optSteamId.get()).thenApply(summaries -> {
+                return ok(views.html.hello.render(summaries.getAvatarUrl()));
             });
 
         } else {
             return CompletableFuture.completedFuture(ok(views.html.index.render()));
         }
     }
-
-
 }
