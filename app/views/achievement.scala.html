@@ -1,16 +1,16 @@
-@(achievementPic: String, achievementName: String)
+@(ach: model.Achievement)
 
 <div class="box">
     <article class="media">
         <div class="media-left">
             <figure class="image is-64x64">
-                <img src=@achievementPic>
+                <img src=@{ if (ach.isAchieved()) ach.getIconUrl() else ach.getIconUrlGray() }>
             </figure>
         </div>
         <div class="media-content">
             <div class="content">
                 <h1 class="title">
-                    @achievementName
+                    @{ ach.getTitle() }
                 </h1>
             </div>
         </div>

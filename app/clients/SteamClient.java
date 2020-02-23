@@ -3,10 +3,15 @@ package clients;
 import javax.inject.Inject;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.inject.internal.cglib.reflect.$FastMember;
+import model.Achievement;
+import model.Game;
 import model.GameSchema;
 import model.PlayerSummaries;
 import play.libs.ws.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CompletionStage;
 
 public class SteamClient implements WSBodyReadables, WSBodyWritables {
@@ -31,7 +36,7 @@ public class SteamClient implements WSBodyReadables, WSBodyWritables {
     }
 
 
-    public CompletionStage<JsonNode> getPlayerAchievements(String steamId, String gameId) {
+    public CompletionStage<List<Achievement>> getPlayerAchievements(String steamId, String gameId) {
         WSRequest request = ws.url("http://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v0001/")
                 .addQueryParameter("appid", gameId)
                 .addQueryParameter("key", STEAM_KEY)
@@ -42,7 +47,7 @@ public class SteamClient implements WSBodyReadables, WSBodyWritables {
             if (response.getStatus() != 200) {
                 throw new IllegalStateException("wrong status from steamApi");
             }
-            return response.getBody(json());
+            return Achievement.parseListFromPlayersAchievements(response.asJson());
         });
     }
 
@@ -60,5 +65,17 @@ public class SteamClient implements WSBodyReadables, WSBodyWritables {
         });
     }
 
+    public CompletionStage<List<Game>> getPlayerGames(String steamId) {
+        WSRequest request = ws.url("http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/")
+                .addQueryParameter("steamid", steamId)
+                .addQueryParameter("key", STEAM_KEY);
+        CompletionStage<WSResponse> responsePromise = request.get();
+        return responsePromise.thenApply(response -> {
+            if (response.getStatus() != 200) {
+                throw new IllegalStateException("wrong status from steamApi");
+            }
+            return Game.parseListFrom(response.getBody(json()));
+        });
+    }
 }
 

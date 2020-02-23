@@ -7,6 +7,7 @@ import model.GameSchema;
 import play.mvc.*;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletionStage;
@@ -21,19 +22,33 @@ public class AchievementsController extends Controller {
                 .get(SteamLoginController.STEAM_ID_NAME);
         String gameId = request.queryString("game_id").get();
 
-        CompletionStage<JsonNode> achievementsPromise = steamClient.getPlayerAchievements(optSteamId.get(), gameId);
+        CompletionStage<List<Achievement>> achievementsPromise = steamClient.getPlayerAchievements(optSteamId.get(), gameId);
         CompletionStage<GameSchema> gameSchemaPromise = steamClient.getSchemaForGame(gameId);
 
 
         return achievementsPromise.thenCombine(gameSchemaPromise, (achievements, schema) -> {
-            String achievId = achievements.get("playerstats").get("achievements").get(0).get("apiname").asText();
+            List<Achievement> achievementList = new ArrayList<>();
 
-            Achievement correct = schema.getAchievementList().stream()
-                    .filter(elem -> elem.getApiName().equals(achievId))
-                    .findFirst()
-                    .orElse(null);
+            for (Achievement elem : achievements) {
+                for (Achievement elem2 : schema.getAchievementList()) {
+                    if (elem.getApiName().equals(elem2.getApiName())) {
+                        achievementList.add(
+                                new Achievement(
+                                        elem2.getIconUrl(),
+                                        elem2.getTitle(),
+                                        elem2.getDescription(),
+                                        elem2.getApiName(),
+                                        elem.isAchieved(),
+                                        elem2.getIconUrlGray()
+                                )
+                        );
+                    }
+                }
 
-            return ok(views.html.achievements.render(correct));
+
+            }
+
+            return ok(views.html.achievements.render(achievementList));
         });
 
     }

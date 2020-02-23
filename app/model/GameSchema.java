@@ -1,7 +1,6 @@
 package model;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import play.libs.Json;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +33,7 @@ public class GameSchema {
         List<Achievement> achievementList = new ArrayList<>();
         JsonNode achievJsonArray = json.get("game").get("availableGameStats").get("achievements");
         for (JsonNode elem : achievJsonArray) {
-            achievementList.add(Achievement.parseFrom(elem));
+            achievementList.add(Achievement.parseFromGameSchema(elem));
         }
         return new GameSchema(id, name, achievementList);
     }

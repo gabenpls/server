@@ -1,9 +1,11 @@
-@(elem: model.Achievement)
+@(list: java.util.List[model.Achievement])
 
 @main("GabenPls")(navigation(null)) {
 <section class="section highlight">
     <div class="container">
-        @achievement(elem.getIconUrl(), elem.getTitle())
+        @for(elem <- list) {
+        @achievement(elem)
+        }
     </div>
 </section>
 }
