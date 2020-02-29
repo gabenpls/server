@@ -24,9 +24,10 @@ public class AchievementsController extends Controller {
 
         CompletionStage<List<Achievement>> achievementsPromise = steamClient.getPlayerAchievements(optSteamId.get(), gameId);
         CompletionStage<GameSchema> gameSchemaPromise = steamClient.getSchemaForGame(gameId);
+        CompletionStage<List<Achievement>> achievementPercentList = steamClient.getAchievementsPercent(gameId);
 
 
-        return achievementsPromise.thenCombine(gameSchemaPromise, (achievements, schema) -> {
+        CompletionStage<List<Achievement>> achievementsList = achievementsPromise.thenCombine(gameSchemaPromise, (achievements, schema) -> {
             List<Achievement> achievementList = new ArrayList<>();
 
             for (Achievement elem : achievements) {
@@ -44,12 +45,35 @@ public class AchievementsController extends Controller {
                         );
                     }
                 }
-
-
             }
 
+            return achievementList;
+        });
+
+        return achievementPercentList.thenCombine(achievementsList, (percent, achievements) -> {
+            List<Achievement> achievementList = new ArrayList<>();
+
+            for (Achievement elem : percent) {
+                for (Achievement elem2 : achievements) {
+                    if (elem.getApiName().equals(elem2.getApiName())) {
+                        achievementList.add(
+                                new Achievement(
+                                        elem2.getIconUrl(),
+                                        elem2.getTitle(),
+                                        elem2.getDescription(),
+                                        elem2.getApiName(),
+                                        elem2.isAchieved(),
+                                        elem2.getIconUrlGray(),
+                                        elem.getPercent()
+                                )
+                        );
+                    }
+                }
+            }
+            
             return ok(views.html.achievements.render(achievementList));
         });
+
 
     }
 }

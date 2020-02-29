@@ -77,5 +77,18 @@ public class SteamClient implements WSBodyReadables, WSBodyWritables {
             return Game.parseListFrom(response.getBody(json()));
         });
     }
+
+    public CompletionStage<List<Achievement>> getAchievementsPercent(String gameId) {
+        WSRequest request = ws.url("http://api.steampowered.com/ISteamUserStats/GetGlobalAchievementPercentagesForApp/v0002/")
+                .addQueryParameter("gameid", gameId)
+                .addQueryParameter("format", "json");
+        CompletionStage<WSResponse> responsePromise = request.get();
+        return responsePromise.thenApply(response -> {
+            if (response.getStatus() != 200) {
+                throw new IllegalStateException("wrong status from steamApi");
+            }
+            return Achievement.parseListPercentFrom(response.getBody(json()));
+        });
+    }
 }
 
