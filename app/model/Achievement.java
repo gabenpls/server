@@ -2,10 +2,7 @@ package model;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class Achievement {
     private final String iconUrl;
@@ -101,7 +98,10 @@ public class Achievement {
     public static Achievement parseFromGameSchema(JsonNode json) {
         String iconUrl = json.get("icon").asText();
         String title = json.get("displayName").asText();
-        String description = json.get("description").asText();
+        String description = "";
+        if (json.get("description") != null) {
+            description = json.get("description").asText();
+        }
         String apiName = json.get("name").asText();
         String iconUrlGray = json.get("icongray").asText();
         return new Achievement(title, iconUrl, description, apiName, iconUrlGray);
@@ -130,23 +130,5 @@ public class Achievement {
         return result;
     }
 
-    public static List<Achievement> sortByPercent(List<Achievement> achievementList) {
-        List<Achievement> sortedList = new ArrayList<>();
-        Achievement tmp;
-        int index = 0;
-        for (int i = 0; i < achievementList.size(); i++) {
-            tmp = achievementList.get(i);
-            for (Achievement elem : achievementList) {
-                if (elem.getPercent() > tmp.getPercent()) {
-                    tmp = elem;
-                    index = achievementList.indexOf(elem);
-                } else {
-                    index = 0;
-                }
-            }
-            sortedList.add(tmp);
-            achievementList.remove(index);
-        }
-        return sortedList;
-    }
+
 }

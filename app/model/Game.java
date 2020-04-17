@@ -24,6 +24,7 @@ public class Game {
 
     public static List<Game> parseListFrom(JsonNode json) {
         List<Game> result = new ArrayList<Game>();
+
         json.get("response").get("games").forEach(nodeElem -> {
             result.add(Game.parseFrom(nodeElem));
         });

@@ -29,13 +29,21 @@ public class GameSchema {
     }
 
     public static GameSchema parseFrom(JsonNode json, int id) {
-        String name = json.get("game").get("gameName").asText();
+
+        String name = "";
+        if (json.get("game").get("gameName") != null) {
+            name = json.get("game").get("gameName").asText();
+        }
         List<Achievement> achievementList = new ArrayList<>();
-        JsonNode achievJsonArray = json.get("game").get("availableGameStats").get("achievements");
-        for (JsonNode elem : achievJsonArray) {
-            achievementList.add(Achievement.parseFromGameSchema(elem));
+
+        if (json.get("game").get("availableGameStats") != null) {
+            JsonNode achievJsonArray = json.get("game").get("availableGameStats").get("achievements");
+            if (achievJsonArray != null) {
+                for (JsonNode elem : achievJsonArray) {
+                    achievementList.add(Achievement.parseFromGameSchema(elem));
+                }
+            }
         }
         return new GameSchema(id, name, achievementList);
     }
-
 }
