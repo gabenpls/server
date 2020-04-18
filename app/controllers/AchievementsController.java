@@ -31,16 +31,9 @@ public class AchievementsController extends Controller {
         if (optSteamId.isEmpty()) {
             return CompletableFuture.completedFuture(redirect("/"));
         }
-        Optional<String> optGameId = request.queryString("game_id");
-        if (optGameId.isEmpty()) {
-            return CompletableFuture.completedFuture(badRequest("You must provide game_id as query param"));
-        }
-        String gameId = optGameId.get();
-
-        String steamId = request.session().get(SteamLoginController.STEAM_ID_NAME).get();
+        String steamId = optSteamId.get();
 
         CompletionStage<List<Game>> ownedGamesPromise = steamClient.getPlayerGames(steamId);
-
         CompletionStage<List<Achievement>> result = ownedGamesPromise.thenCompose(games -> {
 
             CompletionStage<List<Achievement>> finalList = CompletableFuture.completedFuture(new ArrayList<>());
@@ -67,7 +60,7 @@ public class AchievementsController extends Controller {
                 } else return -1;
             });
 
-            return ok(views.html.achievements.render(achievedList.subList(0, 10)));
+            return ok(views.html.achievements.render(optAvatar.orElseGet(null), achievedList.subList(0, 10)));
         });
     }
 
@@ -131,8 +124,6 @@ public class AchievementsController extends Controller {
             } else {
                 return CompletableFuture.completedFuture(schema.getAchievementList());
             }
-
-            return ok(views.html.achievements.render(optAvatar.orElse(null), achievementList));
         });
     }
 }
