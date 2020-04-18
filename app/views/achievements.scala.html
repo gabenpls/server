@@ -1,10 +1,10 @@
-@(avatarUrl: String, list: java.util.List[model.Achievement])
+@(avatarUrl: String, rarestAchieved: java.util.List[model.Achievement], mostCommonUnAchieved: java.util.List[model.Achievement])
 
 @main("GabenPls")(navigation(avatarUrl)) {
 <div class="columns">
     <div class="column">
         <div class="container has-background-light">
-            @for(elem <- list.take(5)) {
+            @for(elem <- rarestAchieved) {
             @achievement(elem)
             }
         </div>
@@ -12,8 +12,8 @@
 
     <div class="column">
         <div class="container has-background-light">
-            @for(elem <- list.take(5)) {
-                @achievement(elem)
+            @for(elem <- mostCommonUnAchieved) {
+            @achievement(elem)
             }
         </div>
     </div>

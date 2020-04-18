@@ -1,6 +1,7 @@
 package controllers;
 
 import clients.SteamClient;
+import logic.AchievementUtils;
 import logic.ListUtils;
 import model.Achievement;
 import model.Game;
@@ -46,17 +47,10 @@ public class AchievementsController extends Controller {
 
 
         return result.thenApply(achievements -> {
-            List<Achievement> achievedList = ListUtils.filter(achievements, Achievement::isAchieved);
+            List<Achievement> rarestAchieved = AchievementUtils.rarestAchieved(achievements, 10);
+            List<Achievement> mostCommonUnAchieved = AchievementUtils.mostCommonUnAchieved(achievements, 10);
 
-            achievedList.sort((o1, o2) -> {
-                if (o1.getPercent() == o2.getPercent()) {
-                    return 0;
-                } else if (o1.getPercent() > o2.getPercent()) {
-                    return 1;
-                } else return -1;
-            });
-
-            return ok(views.html.achievements.render(optAvatar.orElse(null), achievedList.subList(0, 10)));
+            return ok(views.html.achievements.render(optAvatar.orElse(null), rarestAchieved, mostCommonUnAchieved));
         });
     }
 

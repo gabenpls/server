@@ -1,6 +1,7 @@
 package model;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import logic.NumericUtils;
 
 import java.util.*;
 
@@ -125,7 +126,8 @@ public class Achievement {
     public static List<Achievement> parseListPercentFrom(JsonNode json) {
         List<Achievement> result = new ArrayList<>();
         json.get("achievementpercentages").get("achievements").forEach(elem -> {
-            result.add(new Achievement(elem.get("name").asText(), elem.get("percent").asDouble()));
+            double percent = elem.get("percent").asDouble();
+            result.add(new Achievement(elem.get("name").asText(), NumericUtils.round(percent, 2)));
         });
         return result;
     }
