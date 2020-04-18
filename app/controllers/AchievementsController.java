@@ -3,6 +3,7 @@ package controllers;
 import clients.SteamClient;
 import com.fasterxml.jackson.databind.JsonNode;
 import logic.AchievementUtils;
+import logic.ListUtils;
 import model.Achievement;
 import model.Game;
 import model.GameSchema;
@@ -44,14 +45,17 @@ public class AchievementsController extends Controller {
 
 
         return result.thenApply(achievements -> {
-            achievements.sort((o1, o2) -> {
+            List<Achievement> achievedList = ListUtils.filter(achievements, Achievement::isAchieved);
+
+            achievedList.sort((o1, o2) -> {
                 if (o1.getPercent() == o2.getPercent()) {
                     return 0;
                 } else if (o1.getPercent() > o2.getPercent()) {
-                    return -1;
-                } else return 1;
+                    return 1;
+                } else return -1;
             });
-            return ok(views.html.achievements.render(achievements));
+
+            return ok(views.html.achievements.render(achievedList.subList(0, 10)));
         });
     }
 
