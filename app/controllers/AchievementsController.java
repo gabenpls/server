@@ -14,6 +14,7 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
@@ -24,6 +25,17 @@ public class AchievementsController extends Controller {
     SteamClient steamClient;
 
     public CompletionStage<Result> getAchievements(Http.Request request) {
+        Optional<String> optSteamId = request.session().get(SteamLoginController.STEAM_ID_NAME);
+        Optional<String> optAvatar = request.session().get(SteamLoginController.STEAM_AVATAR_URL_NAME);
+        System.out.println(optAvatar);
+        if (optSteamId.isEmpty()) {
+            return CompletableFuture.completedFuture(redirect("/"));
+        }
+        Optional<String> optGameId = request.queryString("game_id");
+        if (optGameId.isEmpty()) {
+            return CompletableFuture.completedFuture(badRequest("You must provide game_id as query param"));
+        }
+        String gameId = optGameId.get();
 
         String steamId = request.session().get(SteamLoginController.STEAM_ID_NAME).get();
 
@@ -119,6 +131,8 @@ public class AchievementsController extends Controller {
             } else {
                 return CompletableFuture.completedFuture(schema.getAchievementList());
             }
+
+            return ok(views.html.achievements.render(optAvatar.orElse(null), achievementList));
         });
     }
 }

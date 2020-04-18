@@ -1,33 +1,35 @@
 @(avatarUrl: String)
 
 <nav class="navbar is-primary" role="navigation" aria-label="main navigation">
-    <div class="navbar-brand">
-        <a class="navbar-item" href="/">
-            <img class="big-logo" src=@{ if (avatarUrl== null) "/assets/images/gaben.jpg" else avatarUrl}>
-            <div class="navbar-brand-text">GABENPLS</div>
-        </a>
-    </div>
-
-    <div id="navbarBasicExample" class="navbar-menu">
-        <div class="navbar-start">
-            <a class="navbar-item">
-                Home
-            </a>
-            <a class="navbar-item">
-                Documentation
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="/">
+                <img class="big-logo" src=@{ if (avatarUrl== null) "/assets/images/gaben.jpg" else avatarUrl}>
+                <div class="navbar-brand-text">GABENPLS</div>
             </a>
         </div>
 
-        <div class="navbar-end">
-            @{ if (avatarUrl != null)
-            <div class="navbar-item">
-                <div class="buttons">
-                    <a class="button is-light" href="/steamLogout">
-                        Log out
-                    </a>
-                </div>
+        <div id="navbarBasicExample" class="navbar-menu">
+            <div class="navbar-start">
+                <a class="navbar-item">
+                    Home
+                </a>
+                <a class="navbar-item">
+                    Documentation
+                </a>
             </div>
-            }
+
+            <div class="navbar-end">
+                @{ if (avatarUrl != null)
+                <div class="navbar-item">
+                    <div class="buttons">
+                        <a class="button is-light" href="/steamLogout">
+                            Log out
+                        </a>
+                    </div>
+                </div>
+                }
+            </div>
         </div>
     </div>
 </nav>
