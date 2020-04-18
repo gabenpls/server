@@ -27,7 +27,6 @@ public class AchievementsController extends Controller {
     public CompletionStage<Result> getAchievements(Http.Request request) {
         Optional<String> optSteamId = request.session().get(SteamLoginController.STEAM_ID_NAME);
         Optional<String> optAvatar = request.session().get(SteamLoginController.STEAM_AVATAR_URL_NAME);
-        System.out.println(optAvatar);
         if (optSteamId.isEmpty()) {
             return CompletableFuture.completedFuture(redirect("/"));
         }

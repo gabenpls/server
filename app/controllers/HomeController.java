@@ -19,8 +19,6 @@ import java.util.concurrent.CompletionStage;
  */
 public class HomeController extends Controller {
 
-    @Inject
-    SteamClient steamClient;
     final Logger log = LoggerFactory.getLogger(this.getClass());
 
     /**
