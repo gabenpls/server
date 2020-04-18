@@ -1,20 +1,17 @@
 package controllers;
 
 import clients.SteamClient;
-import com.fasterxml.jackson.databind.JsonNode;
-import logic.AchievementUtils;
 import logic.ListUtils;
 import model.Achievement;
 import model.Game;
 import model.GameSchema;
-import play.mvc.*;
+import play.mvc.Controller;
+import play.mvc.Http;
+import play.mvc.Result;
 
 import javax.inject.Inject;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
@@ -59,7 +56,7 @@ public class AchievementsController extends Controller {
                 } else return -1;
             });
 
-            return ok(views.html.achievements.render(optAvatar.orElseGet(null), achievedList.subList(0, 10)));
+            return ok(views.html.achievements.render(optAvatar.orElse(null), achievedList.subList(0, 10)));
         });
     }
 
