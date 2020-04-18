@@ -7,6 +7,8 @@ import play.mvc.*;
 
 import javax.inject.Inject;
 import javax.management.StandardEmitterMBean;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
@@ -27,16 +29,12 @@ public class HomeController extends Controller {
      * this method will be called when the application receives a
      * <code>GET</code> request with a path of <code>/</code>.
      */
-    public CompletionStage<Result> index(Http.Request request) {
-        Optional<String> optSteamId = request.session()
-                .get(SteamLoginController.STEAM_ID_NAME);
+    public Result index(Http.Request request) {
+        Optional<String> optSteamId = request.session().get(SteamLoginController.STEAM_ID_NAME);
         if (optSteamId.isPresent()) {
-            return steamClient.getPlayerSummaries(optSteamId.get()).thenApply(summaries -> {
-                return ok(views.html.hello.render(summaries.getAvatarUrl()));
-            });
-
+            return redirect("/achievements", Map.of("game_id", List.of("440")));
         } else {
-            return CompletableFuture.completedFuture(ok(views.html.index.render()));
+            return ok(views.html.index.render());
         }
     }
 }

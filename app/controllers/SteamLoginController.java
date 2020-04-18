@@ -1,5 +1,6 @@
 package controllers;
 
+import clients.SteamClient;
 import play.libs.openid.OpenIdClient;
 import play.libs.openid.UserInfo;
 import play.mvc.*;
@@ -11,10 +12,14 @@ import java.util.concurrent.CompletionStage;
 public class SteamLoginController extends Controller {
 
     public static final String STEAM_ID_NAME = "steam_id";
+    public static final String STEAM_AVATAR_URL_NAME = "avatar_url";
 
 
     @Inject
     OpenIdClient openIdClient;
+
+    @Inject
+    SteamClient steamClient;
 
     private String parseSteamId(String userUrl) {
         return userUrl.replace("https://steamcommunity.com/openid/id/", "");
@@ -22,13 +27,13 @@ public class SteamLoginController extends Controller {
 
     public CompletionStage<Result> login(Http.Request request) {
 
-        CompletionStage<String> redirectUrlPromise =
-                openIdClient.redirectURL(
-                        "https://steamcommunity.com/openid", routes.SteamLoginController.callBack().absoluteURL(request));
+        CompletionStage<String> redirectUrlPromise = openIdClient
+                .redirectURL(
+                        "https://steamcommunity.com/openid",
+                        routes.SteamLoginController.callBack().absoluteURL(request)
+                );
 
-        return redirectUrlPromise
-                .thenApply(Controller::redirect);
-//                .exceptionally(throwable -> badRequest(views.html.login.render(throwable.getMessage())));
+        return redirectUrlPromise.thenApply(Controller::redirect);
     }
 
     public Result logout(Http.Request request) {
@@ -38,14 +43,16 @@ public class SteamLoginController extends Controller {
 
     public CompletionStage<Result> callBack(Http.Request request) {
         return openIdClient.verifiedId(request)
-                .thenApply(userInfo -> {
+                .thenCompose(userInfo -> {
                     String steamId = parseSteamId(userInfo.id());
-                    Result response = redirect("/");
-                    response = response.addingToSession(request, STEAM_ID_NAME, steamId);
-                    return response;
-
-                })
-                .exceptionally(throwable -> badRequest(views.html.hello.render(throwable.getMessage())));
+                    return steamClient.getPlayerSummaries(steamId).thenApply(playerSummaries -> {
+                        String avatarUrl = playerSummaries.getAvatarUrl();
+                        Result response = redirect("/achievements?game_id=440");
+                        response = response.addingToSession(request, STEAM_ID_NAME, steamId);
+                        response = response.addingToSession(request, STEAM_AVATAR_URL_NAME, avatarUrl);
+                        return response;
+                    });
+                });
     }
 
 }

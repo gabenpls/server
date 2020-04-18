@@ -14,6 +14,7 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
@@ -24,11 +25,15 @@ public class AchievementsController extends Controller {
     SteamClient steamClient;
 
     public CompletionStage<Result> getAchievements(Http.Request request) {
-
-        String steamId = request.session().get(SteamLoginController.STEAM_ID_NAME).get();
+        Optional<String> optSteamId = request.session().get(SteamLoginController.STEAM_ID_NAME);
+        Optional<String> optAvatar = request.session().get(SteamLoginController.STEAM_AVATAR_URL_NAME);
+        System.out.println(optAvatar);
+        if (optSteamId.isEmpty()) {
+            return CompletableFuture.completedFuture(redirect("/"));
+        }
+        String steamId = optSteamId.get();
 
         CompletionStage<List<Game>> ownedGamesPromise = steamClient.getPlayerGames(steamId);
-
         CompletionStage<List<Achievement>> result = ownedGamesPromise.thenCompose(games -> {
 
             CompletionStage<List<Achievement>> finalList = CompletableFuture.completedFuture(new ArrayList<>());
@@ -55,7 +60,7 @@ public class AchievementsController extends Controller {
                 } else return -1;
             });
 
-            return ok(views.html.achievements.render(achievedList.subList(0, 10)));
+            return ok(views.html.achievements.render(optAvatar.orElseGet(null), achievedList.subList(0, 10)));
         });
     }
 

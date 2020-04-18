@@ -1,11 +1,21 @@
-@(list: java.util.List[model.Achievement])
+@(avatarUrl: String, list: java.util.List[model.Achievement])
 
-@main("GabenPls")(navigation(null)) {
-<section class="section highlight">
-    <div class="container">
-        @for(elem <- list) {
-        @achievement(elem)
-        }
+@main("GabenPls")(navigation(avatarUrl)) {
+<div class="columns">
+    <div class="column">
+        <div class="container has-background-light">
+            @for(elem <- list.take(5)) {
+            @achievement(elem)
+            }
+        </div>
     </div>
-</section>
+
+    <div class="column">
+        <div class="container has-background-light">
+            @for(elem <- list.take(5)) {
+                @achievement(elem)
+            }
+        </div>
+    </div>
+</div>
 }
