@@ -72,7 +72,8 @@ public class SteamClient implements WSBodyReadables, WSBodyWritables {
         WSRequest request = ws.url("http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/")
                 .addQueryParameter("steamid", steamId)
                 .addQueryParameter("key", STEAM_KEY)
-                .addQueryParameter("include_played_free_games", "1");
+                .addQueryParameter("include_played_free_games", "1")
+                .addQueryParameter("include_appinfo", "1");
 
         CompletionStage<WSResponse> responsePromise = request.get();
         return responsePromise.thenApply(response -> {

@@ -13,6 +13,15 @@ public class Achievement {
     private final boolean isAchieved;
     private final String iconUrlGray;
     private final double percent;
+    private Game game;
+
+    public void setGame(Game game) {
+        this.game = game;
+    }
+
+    public Game getGame() {
+        return game;
+    }
 
     public String getIconUrl() {
         return iconUrl;

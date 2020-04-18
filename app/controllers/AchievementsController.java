@@ -38,6 +38,9 @@ public class AchievementsController extends Controller {
                 CompletionStage<List<Achievement>> achievementReq = this.achievementsForGame(steamId, game.getId());
 
                 finalList = finalList.thenCombine(achievementReq, (allAchievements, gameAchievements) -> {
+                    for (Achievement a : gameAchievements) {
+                        a.setGame(game);
+                    }
                     allAchievements.addAll(gameAchievements);
                     return allAchievements;
                 });
