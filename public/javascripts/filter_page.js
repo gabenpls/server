@@ -5,10 +5,11 @@
             method: 'POST',
             url: '/api/achievements/filter',
             dataType: 'json',
-            contentType: 'application/json; charset=utf-8;',
+            contentType: 'application/json',
             data: JSON.stringify({
                 games: games
-            })
+            }),
+            processData: false
         }).done(msg => {
             console.log(msg);
         });

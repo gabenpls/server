@@ -164,8 +164,6 @@ public class AchievementsController extends Controller {
             return CompletableFuture.completedFuture(redirect("/"));
         }
         String steamId = optSteamId.get();
-
-        JsonNode json = request.body().asJson();
         System.out.println(request.body().asJson());
 
         return CompletableFuture.completedFuture(ok());
