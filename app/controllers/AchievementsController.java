@@ -169,21 +169,12 @@ public class AchievementsController extends Controller {
         JsonNode node = request.body().asJson();
         Filter filter = Filter.parseFrom(node);
 
-//        for (Integer id : filter.getGameIds()) {
-//
-//            pageInfoPromise.thenApply(info -> {
-//                for (Achievement a : info.getAchievements()) {
-//                    if (a.getGame().getId() == id) {
-//                        filteredList.add(a);
-//                    }
-//                }
-//                return filteredList;
-//            });
-//            });
-//
-//        }
         return pageInfoPromise.thenApply(info -> {
-            return ok(info.asJson());
+            List<Achievement> filteredAch = ListUtils.filter(info.getAchievements(), ach -> {
+                return filter.getGameIds().indexOf(ach.getGame().getId()) >= 0;
+            });
+            FilterPageRenderInfo filteredInfo = new FilterPageRenderInfo(filteredAch, info.getGames());
+            return ok(filteredInfo.page(0, 20).asJson());
         });
     }
 

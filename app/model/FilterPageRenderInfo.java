@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import play.libs.Json;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class FilterPageRenderInfo {
@@ -42,5 +43,12 @@ public class FilterPageRenderInfo {
 //        result.set("games", gamesJson);
 
         return result;
+    }
+
+    public FilterPageRenderInfo page(int number, int size) {
+
+        List<Achievement> currentPage = this.achievements.subList(number * size, number * size + size);
+
+        return new FilterPageRenderInfo(currentPage, this.games);
     }
 }
