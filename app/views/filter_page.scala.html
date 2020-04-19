@@ -1,0 +1,24 @@
+@(avatarUrl: String, initialAchievements: java.util.List[model.Achievement], games: java.util.List[model.Game])
+
+@main("Filter your achievements")(navigation(avatarUrl)) {
+    <div class="container">
+        <form>
+            <label class="label">Select Game</label>
+            <div class="control">
+                <div class="select">
+                    <select>
+                        @for(game <- games) {
+                        <option>@{ game.getName }</option>
+                        }
+                    </select>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="container has-background-light">
+        @for(elem <- initialAchievements) {
+            @achievement(elem)
+        }
+    </div>
+}
