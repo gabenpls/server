@@ -3,10 +3,8 @@
 @main("GabenPls")(navigation(avatarUrl)) {
 <div class="columns">
     <div class="column">
-        <div class="container has-background-light">
-            <a href="/achievements/filter">
-                <h1>Your rarest achievements</h1>
-            </a>
+        <div class="container box has-background-light">
+            <h3 class="title is-3"><a href="/achievements/filter">Your rarest achievements</a></h3>
             @for(elem <- rarestAchieved) {
             @achievement(elem)
             }
@@ -14,10 +12,8 @@
     </div>
 
     <div class="column">
-        <div class="container has-background-light">
-            <a href="/achievements/filter">
-                <h1>Easiest to get</h1>
-            </a>
+        <div class="container box has-background-light">
+            <h3 class="title is-3"><a href="/achievements/filter">Easiest to get</a></h3>
             @for(elem <- mostCommonUnAchieved) {
             @achievement(elem)
             }

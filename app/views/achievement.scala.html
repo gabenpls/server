@@ -1,6 +1,6 @@
 @(ach: model.Achievement)
 
-<div class="box" style="height:100px">
+<div class="box gp-achievement">
     <article class="media">
         <div class="media-left">
             <figure class="image is-64x64">
@@ -9,14 +9,19 @@
         </div>
         <div class="media-content">
             <div class="content">
-                <h4 class="title">
+                <h6 class="title is-6">
                     @{ ach.getTitle() }
-                </h4>
+                </h6>
                 <p>
-                    @{ ach.getPercent() }%
+                    @{ if (ach.getDescription().isEmpty()) "   " else ach.getDescription() }
                 </p>
-                <p><img src="@{ ach.getGame().getIconUrl() }" title="@{ ach.getGame().getName() }"></p>
+                <div class="gp-complection-persent">
+                    @{ ach.getPercent() }%
+                </div>
             </div>
+        </div>
+        <div class="media-right">
+            <img src="@{ ach.getGame().getIconUrl() }" title="@{ ach.getGame().getName() }">
         </div>
     </article>
 </div>
