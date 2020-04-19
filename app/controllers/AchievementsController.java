@@ -4,9 +4,7 @@ import clients.SteamClient;
 import com.fasterxml.jackson.databind.JsonNode;
 import logic.AchievementUtils;
 import logic.ListUtils;
-import model.Achievement;
-import model.Game;
-import model.GameSchema;
+import model.*;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
@@ -164,10 +162,51 @@ public class AchievementsController extends Controller {
             return CompletableFuture.completedFuture(redirect("/"));
         }
         String steamId = optSteamId.get();
-        System.out.println(request.body().asJson());
 
-        return CompletableFuture.completedFuture(ok());
+        List<Achievement> filteredList = new ArrayList<>();
+        CompletionStage<FilterPageRenderInfo> pageInfoPromise = this.getAllPlayerAchievements(steamId);
+
+        JsonNode node = request.body().asJson();
+        Filter filter = Filter.parseFrom(node);
+
+//        for (Integer id : filter.getGameIds()) {
+//
+//            pageInfoPromise.thenApply(info -> {
+//                for (Achievement a : info.getAchievements()) {
+//                    if (a.getGame().getId() == id) {
+//                        filteredList.add(a);
+//                    }
+//                }
+//                return filteredList;
+//            });
+//            });
+//
+//        }
+        return pageInfoPromise.thenApply(info -> {
+            return ok(info.asJson());
+        });
     }
 
+    private CompletionStage<FilterPageRenderInfo> getAllPlayerAchievements(String steamId) {
+
+        CompletionStage<List<Game>> ownedGamesPromise = steamClient.getPlayerGames(steamId);
+        CompletionStage<List<Achievement>> achievementListPromise = ownedGamesPromise.thenCompose(games -> {
+
+            CompletionStage<List<Achievement>> finalList = CompletableFuture.completedFuture(new ArrayList<>());
+            for (Game game : games) {
+                CompletionStage<List<Achievement>> achievementReq = this.achievementsForGame(steamId, game.getId());
+
+                finalList = finalList.thenCombine(achievementReq, (allAchievements, gameAchievements) -> {
+                    for (Achievement a : gameAchievements) {
+                        a.setGame(game);
+                    }
+                    allAchievements.addAll(gameAchievements);
+                    return allAchievements;
+                });
+            }
+            return finalList;
+        });
+        return achievementListPromise.thenCombine(ownedGamesPromise, FilterPageRenderInfo::new);
+    }
 }
 

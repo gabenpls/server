@@ -1,6 +1,8 @@
 package model;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import play.libs.Json;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +47,15 @@ public class Game {
         json.get("response").get("games").forEach(nodeElem -> {
             result.add(Game.parseFrom(nodeElem));
         });
+        return result;
+    }
+
+    public ObjectNode asJson() {
+        ObjectNode result = Json.newObject();
+        result.put("id", this.id);
+        result.put("name", this.name);
+        result.put("iconUrl", this.iconUrl);
+
         return result;
     }
 }

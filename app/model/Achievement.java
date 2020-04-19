@@ -1,7 +1,9 @@
 package model;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import logic.NumericUtils;
+import play.libs.Json;
 
 import java.util.*;
 
@@ -138,6 +140,21 @@ public class Achievement {
             double percent = elem.get("percent").asDouble();
             result.add(new Achievement(elem.get("name").asText(), NumericUtils.round(percent, 2)));
         });
+        return result;
+    }
+
+    public ObjectNode asJson() {
+        ObjectNode result = Json.newObject();
+
+        result.put("iconUrl", this.iconUrl);
+        result.put("title", this.title);
+        result.put("description", this.description);
+        result.put("apiName", this.apiName);
+        result.put("iconUrlGray", this.iconUrlGray);
+        result.put("isAchieved", this.isAchieved);
+        result.put("percent", this.percent);
+        result.set("game", this.game.asJson());
+
         return result;
     }
 
