@@ -119,4 +119,40 @@ public class AchievementsController extends Controller {
             }
         });
     }
+
+    public CompletionStage<Result> filteredByGame(Http.Request request) {
+        Optional<String> optSteamId = request.session().get(SteamLoginController.STEAM_ID_NAME);
+        Optional<String> optAvatar = request.session().get(SteamLoginController.STEAM_AVATAR_URL_NAME);
+        if (optSteamId.isEmpty()) {
+            return CompletableFuture.completedFuture(redirect("/"));
+        }
+        String steamId = optSteamId.get();
+
+
+        CompletionStage<List<Game>> ownedGamesPromise = steamClient.getPlayerGames(steamId);
+
+        CompletionStage<List<Achievement>> initialAchievements = ownedGamesPromise.thenCompose(games -> {
+
+            CompletionStage<List<Achievement>> finalList = CompletableFuture.completedFuture(new ArrayList<>());
+            for (Game game : games) {
+                CompletionStage<List<Achievement>> achievementReq = this.achievementsForGame(steamId, game.getId());
+
+                finalList = finalList.thenCombine(achievementReq, (allAchievements, gameAchievements) -> {
+                    for (Achievement a : gameAchievements) {
+                        a.setGame(game);
+                    }
+                    allAchievements.addAll(gameAchievements);
+                    return allAchievements;
+                });
+            }
+            return finalList;
+        });
+
+
+        return initialAchievements.thenCombine(ownedGamesPromise, (achList, games) -> {
+            return ok(views.html.filter_page.render(optAvatar.orElse(null), achList, games));
+        });
+
+    }
 }
+
