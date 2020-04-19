@@ -16,7 +16,7 @@ import java.util.concurrent.CompletionStage;
 
 public class SteamClient implements WSBodyReadables, WSBodyWritables {
     private final WSClient ws;
-    private static final String STEAM_KEY = "A9F0A04C59611FF92C1005BB076AD5C6";
+    private static final String STEAM_KEY = "00A01E3C408E32DE20C045C5FCCD944E";
 
     @Inject
     public SteamClient(WSClient ws) {
@@ -88,6 +88,7 @@ public class SteamClient implements WSBodyReadables, WSBodyWritables {
         WSRequest request = ws.url("http://api.steampowered.com/ISteamUserStats/GetGlobalAchievementPercentagesForApp/v0002/")
                 .addQueryParameter("gameid", gameId.toString())
                 .addQueryParameter("format", "json");
+
         CompletionStage<WSResponse> responsePromise = request.get();
         return responsePromise.thenApply(response -> {
             if (response.getStatus() != 200) {
