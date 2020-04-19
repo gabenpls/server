@@ -39,7 +39,7 @@ public class FilterPageRenderInfo {
         }
 
         result.set("achievements", achievementsJson);
-        result.set("games", gamesJson);
+//        result.set("games", gamesJson);
 
         return result;
     }
