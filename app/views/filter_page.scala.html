@@ -2,13 +2,13 @@
 
 @main("Filter your achievements")(navigation(avatarUrl)) {
     <div class="container">
-        <form>
+        <form id="gp-achievements-filter">
             <label class="label">Select Game</label>
             <div class="control">
-                <div class="select">
-                    <select>
+                <div class="select is-multiple">
+                    <select id="gp-game-select" size="4" multiple>
                         @for(game <- games) {
-                        <option>@{ game.getName }</option>
+                        <option value="@{ game.getId() }">@{ game.getName }</option>
                         }
                     </select>
                 </div>
@@ -21,4 +21,5 @@
             @achievement(elem)
         }
     </div>
+    <script src="@routes.Assets.versioned("javascripts/filter_page.js")" type="text/javascript"></script>
 }

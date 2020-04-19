@@ -150,7 +150,7 @@ public class AchievementsController extends Controller {
 
 
         return initialAchievements.thenCombine(ownedGamesPromise, (achList, games) -> {
-            return ok(views.html.filter_page.render(optAvatar.orElse(null), achList, games));
+            return ok(views.html.filter_page.render(optAvatar.orElse(null), achList.subList(0, 10), games));
         });
 
     }
