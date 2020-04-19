@@ -8,4 +8,5 @@ GET     /steamLogin             controllers.SteamLoginController.login(request: 
 GET     /callBack               controllers.SteamLoginController.callBack(request: Request)
 GET     /steamLogout            controllers.SteamLoginController.logout(request: Request)
 GET     /achievements           controllers.AchievementsController.getAchievements(request: Request)
-GET     /achievements/filter    controllers.AchievementsController.filteredByGame(request: Request)
+GET     /achievements/filter    controllers.AchievementsController.filterPage(request: Request)
+POST    /api/achievements/filter    controllers.AchievementsController.filter(request: Request)

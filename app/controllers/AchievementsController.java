@@ -1,6 +1,7 @@
 package controllers;
 
 import clients.SteamClient;
+import com.fasterxml.jackson.databind.JsonNode;
 import logic.AchievementUtils;
 import logic.ListUtils;
 import model.Achievement;
@@ -21,6 +22,7 @@ public class AchievementsController extends Controller {
 
     @Inject
     SteamClient steamClient;
+
 
     public CompletionStage<Result> getAchievements(Http.Request request) {
         Optional<String> optSteamId = request.session().get(SteamLoginController.STEAM_ID_NAME);
@@ -120,7 +122,7 @@ public class AchievementsController extends Controller {
         });
     }
 
-    public CompletionStage<Result> filteredByGame(Http.Request request) {
+    public CompletionStage<Result> filterPage(Http.Request request) {
         Optional<String> optSteamId = request.session().get(SteamLoginController.STEAM_ID_NAME);
         Optional<String> optAvatar = request.session().get(SteamLoginController.STEAM_AVATAR_URL_NAME);
         if (optSteamId.isEmpty()) {
@@ -154,5 +156,20 @@ public class AchievementsController extends Controller {
         });
 
     }
+
+    public CompletionStage<Result> filter(Http.Request request) {
+        Optional<String> optSteamId = request.session().get(SteamLoginController.STEAM_ID_NAME);
+        Optional<String> optAvatar = request.session().get(SteamLoginController.STEAM_AVATAR_URL_NAME);
+        if (optSteamId.isEmpty()) {
+            return CompletableFuture.completedFuture(redirect("/"));
+        }
+        String steamId = optSteamId.get();
+
+        JsonNode json = request.body().asJson();
+        System.out.println(request.body().asJson());
+
+        return CompletableFuture.completedFuture(ok());
+    }
+
 }
 
