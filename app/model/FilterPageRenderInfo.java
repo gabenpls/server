@@ -29,11 +29,17 @@ public class FilterPageRenderInfo {
     public ObjectNode asJson() {
         ObjectNode result = Json.newObject();
         ArrayNode achievementsJson = Json.newArray();
+        ArrayNode gamesJson = Json.newArray();
+
         for (Achievement ach : this.getAchievements()) {
             achievementsJson.add(ach.asJson());
         }
-        result.set("achievements", achievementsJson);
+        for (Game game : this.getGames()) {
+            gamesJson.add(game.asJson());
+        }
 
+        result.set("achievements", achievementsJson);
+        result.set("games", gamesJson);
 
         return result;
     }
