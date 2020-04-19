@@ -5,6 +5,7 @@
             method: 'POST',
             url: '/api/achievements/filter',
             dataType: 'json',
+            contentType: 'application/json;',
             data: {
                 games
             }
