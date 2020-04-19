@@ -4,6 +4,9 @@
 <div class="columns">
     <div class="column">
         <div class="container has-background-light">
+            <a href="/achievements/filter">
+                <h1>Your rarest achievements</h1>
+            </a>
             @for(elem <- rarestAchieved) {
             @achievement(elem)
             }
@@ -12,6 +15,9 @@
 
     <div class="column">
         <div class="container has-background-light">
+            <a href="/achievements/filter">
+                <h1>Easiest to get</h1>
+            </a>
             @for(elem <- mostCommonUnAchieved) {
             @achievement(elem)
             }

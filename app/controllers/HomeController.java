@@ -30,7 +30,7 @@ public class HomeController extends Controller {
     public Result index(Http.Request request) {
         Optional<String> optSteamId = request.session().get(SteamLoginController.STEAM_ID_NAME);
         if (optSteamId.isPresent()) {
-            return redirect("/achievements", Map.of("game_id", List.of("440")));
+            return redirect("/achievements");
         } else {
             return ok(views.html.index.render());
         }
