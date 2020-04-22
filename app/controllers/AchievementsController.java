@@ -22,7 +22,7 @@ public class AchievementsController extends Controller {
     SteamClient steamClient;
 
 
-    public CompletionStage<Result> getAchievements(Http.Request request) {
+    public CompletionStage<Result> mainPage(Http.Request request) {
         Optional<String> optSteamId = request.session().get(SteamLoginController.STEAM_ID_NAME);
         Optional<String> optAvatar = request.session().get(SteamLoginController.STEAM_AVATAR_URL_NAME);
         if (optSteamId.isEmpty()) {
@@ -30,33 +30,15 @@ public class AchievementsController extends Controller {
         }
         String steamId = optSteamId.get();
 
-        CompletionStage<List<Game>> ownedGamesPromise = steamClient.getPlayerGames(steamId);
-        CompletionStage<List<Achievement>> result = ownedGamesPromise.thenCompose(games -> {
+        return getAllPlayerAchievements(steamId)
+                .thenApply(FilterPageRenderInfo::getAchievements)
+                .thenApply(achievements -> {
+                    List<Achievement> rarestAchieved = AchievementUtils.rarestAchieved(achievements, 10);
+                    List<Achievement> mostCommonUnAchieved = AchievementUtils.mostCommonUnAchieved(achievements, 10);
 
-            CompletionStage<List<Achievement>> finalList = CompletableFuture.completedFuture(new ArrayList<>());
-            for (Game game : games) {
-                CompletionStage<List<Achievement>> achievementReq = this.achievementsForGame(steamId, game.getId());
-
-                finalList = finalList.thenCombine(achievementReq, (allAchievements, gameAchievements) -> {
-                    for (Achievement a : gameAchievements) {
-                        a.setGame(game);
-                    }
-                    allAchievements.addAll(gameAchievements);
-                    return allAchievements;
+                    return ok(views.html.achievements.render(optAvatar.orElse(null), rarestAchieved, mostCommonUnAchieved));
                 });
-            }
-            return finalList;
-        });
-
-
-        return result.thenApply(achievements -> {
-            List<Achievement> rarestAchieved = AchievementUtils.rarestAchieved(achievements, 10);
-            List<Achievement> mostCommonUnAchieved = AchievementUtils.mostCommonUnAchieved(achievements, 10);
-
-            return ok(views.html.achievements.render(optAvatar.orElse(null), rarestAchieved, mostCommonUnAchieved));
-        });
     }
-
 
     private CompletionStage<List<Achievement>> achievementsForGame(String steamId, Integer gameId) {
 
@@ -128,30 +110,12 @@ public class AchievementsController extends Controller {
         }
         String steamId = optSteamId.get();
 
-
-        CompletionStage<List<Game>> ownedGamesPromise = steamClient.getPlayerGames(steamId);
-
-        CompletionStage<List<Achievement>> initialAchievements = ownedGamesPromise.thenCompose(games -> {
-
-            CompletionStage<List<Achievement>> finalList = CompletableFuture.completedFuture(new ArrayList<>());
-            for (Game game : games) {
-                CompletionStage<List<Achievement>> achievementReq = this.achievementsForGame(steamId, game.getId());
-
-                finalList = finalList.thenCombine(achievementReq, (allAchievements, gameAchievements) -> {
-                    for (Achievement a : gameAchievements) {
-                        a.setGame(game);
-                    }
-                    allAchievements.addAll(gameAchievements);
-                    return allAchievements;
-                });
-            }
-            return finalList;
-        });
+        CompletionStage<FilterPageRenderInfo> info = getAllPlayerAchievements(steamId);
 
 
-        return initialAchievements.thenCombine(ownedGamesPromise, (achList, games) -> {
-            return ok(views.html.filter_page.render(optAvatar.orElse(null), achList.subList(0, 10), games));
-        });
+        return info
+                .thenApply(i -> i.page(0, 10))
+                .thenApply(i -> ok(views.html.filter_page.render(optAvatar.orElse(null), i.getAchievements(), i.getGames())));
 
     }
 
@@ -163,7 +127,6 @@ public class AchievementsController extends Controller {
         }
         String steamId = optSteamId.get();
 
-        List<Achievement> filteredList = new ArrayList<>();
         CompletionStage<FilterPageRenderInfo> pageInfoPromise = this.getAllPlayerAchievements(steamId);
 
         JsonNode node = request.body().asJson();

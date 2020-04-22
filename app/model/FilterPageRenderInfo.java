@@ -46,6 +46,7 @@ public class FilterPageRenderInfo {
     }
 
     public FilterPageRenderInfo page(int number, int size) {
+        
 
         List<Achievement> currentPage = this.achievements.subList(number * size, number * size + size);
 

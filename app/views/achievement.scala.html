@@ -1,6 +1,6 @@
 @(ach: model.Achievement)
 
-<div class="box gp-achievement">
+<div class="box gp-achievement" xmlns:https="http://www.w3.org/1999/xhtml">
     <article class="media">
         <div class="media-left">
             <figure class="image is-64x64">
@@ -13,7 +13,7 @@
                     @{ ach.getTitle() }
                 </h6>
                 <p>
-                    @{ if (ach.getDescription().isEmpty()) "   " else ach.getDescription() }
+                    @{ if (ach.getDescription().isEmpty()) " " else ach.getDescription() }
                 </p>
                 <div class="gp-complection-persent">
                     @{ ach.getPercent() }%
@@ -22,6 +22,11 @@
         </div>
         <div class="media-right">
             <img src="@{ ach.getGame().getIconUrl() }" title="@{ ach.getGame().getName() }">
+            <a href="@{ String.format(" https://google.com/search?q=achievement+%s+%s", ach.getTitle(),
+            ach.getGame().getName()) }">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/588px-Google_%22G%22_Logo.svg.png"
+                 title="find help in google" width="32" height="32">
+            </a>
         </div>
     </article>
 </div>
