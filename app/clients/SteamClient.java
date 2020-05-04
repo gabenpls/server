@@ -12,6 +12,7 @@ import play.libs.ws.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletionStage;
 
 public class SteamClient implements WSBodyReadables, WSBodyWritables {
@@ -110,6 +111,49 @@ public class SteamClient implements WSBodyReadables, WSBodyWritables {
         errorText.append("\n");
 
         throw new IllegalStateException(errorText.toString());
+    }
+
+    public CompletionStage<Boolean> isVisible(String steamId) {
+        WSRequest statusRequest = ws.url("http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/")
+                .addQueryParameter("key", STEAM_KEY)
+                .addQueryParameter("steamids", steamId);
+        CompletionStage<WSResponse> statusPromise = statusRequest.get();
+
+//        WSRequest gameRequest = ws.url("http://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v0001/")
+//                .addQueryParameter("key", STEAM_KEY)
+//                .addQueryParameter("appid", "440")
+//                .addQueryParameter("steamids", steamId);
+//        CompletionStage<WSResponse> gamePromise = gameRequest.get();
+//
+//        return statusPromise.thenCombine(gamePromise, (status, game) -> {
+//
+//            if (status.getStatus() != 200) {
+//                error(status);
+//            }
+//
+//            int visibleParam = status.getBody(json())
+//                    .get("response")
+//                    .get("players")
+//                    .get(0)
+//                    .get("communityvisibilitystate").asInt();
+//
+//
+//            return visibleParam == 3 && game.getStatus() == 200;
+//        });
+
+
+        return statusPromise.thenApply(response -> {
+            if (response.getStatus() != 200) {
+                error(response);
+            }
+            int visibleParam = response.getBody(json())
+                    .get("response")
+                    .get("players")
+                    .get(0)
+                    .get("communityvisibilitystate").asInt();
+            return (visibleParam == 3);
+        });
+
     }
 }
 

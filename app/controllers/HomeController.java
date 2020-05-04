@@ -19,6 +19,9 @@ import java.util.concurrent.CompletionStage;
  */
 public class HomeController extends Controller {
 
+    @Inject
+    SteamClient steamClient;
+
     final Logger log = LoggerFactory.getLogger(this.getClass());
 
     /**
@@ -27,12 +30,24 @@ public class HomeController extends Controller {
      * this method will be called when the application receives a
      * <code>GET</code> request with a path of <code>/</code>.
      */
-    public Result index(Http.Request request) {
+    public CompletionStage<Result> index(Http.Request request) {
         Optional<String> optSteamId = request.session().get(SteamLoginController.STEAM_ID_NAME);
+        CompletionStage<Boolean> isVisible;
+
         if (optSteamId.isPresent()) {
-            return redirect("/achievements");
-        } else {
-            return ok(views.html.index.render());
-        }
+            isVisible = steamClient.isVisible(optSteamId.get());
+        } else return CompletableFuture.completedFuture(ok(views.html.index.render()));
+
+        return isVisible.thenApply(iv -> {
+            if (iv) {
+                return redirect("/achievements");
+            } else {
+                return redirect("/changePrivacySettings");
+            }
+        });
+    }
+
+    public Result privacyChangingPage(Http.Request request) {
+        return ok(views.html.changePrivacySettings.render());
     }
 }
