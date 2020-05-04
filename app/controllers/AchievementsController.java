@@ -63,7 +63,10 @@ public class AchievementsController extends Controller {
                                                 elem2.getDescription(),
                                                 elem2.getApiName(),
                                                 elem.isAchieved(),
-                                                elem2.getIconUrlGray()
+                                                elem2.getIconUrlGray(),
+                                                null,
+                                                elem.getUnlockTime(),
+                                                null
                                         )
                                 );
                             }
