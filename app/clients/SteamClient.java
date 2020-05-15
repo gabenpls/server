@@ -75,7 +75,6 @@ public class SteamClient implements WSBodyReadables, WSBodyWritables {
                 .addQueryParameter("key", STEAM_KEY)
                 .addQueryParameter("include_played_free_games", "1")
                 .addQueryParameter("include_appinfo", "1");
-
         CompletionStage<WSResponse> responsePromise = request.get();
         return responsePromise.thenApply(response -> {
             if (response.getStatus() != 200) {
