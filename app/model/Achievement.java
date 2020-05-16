@@ -71,7 +71,7 @@ public class Achievement {
         this.unlockTime = unlockTime;
         this.game = game;
     }
-    
+
     public Achievement mergeAch(Achievement ach) {
         return new Achievement(
                 this.getIconUrl() != null ? this.getIconUrl() : ach.getIconUrl(),
@@ -87,7 +87,7 @@ public class Achievement {
     }
 
 
-    public Achievement mergeGame(Game game) {
+    public Achievement mergeAch(Game game) {
         return new Achievement(
                 this.getIconUrl(),
                 this.getTitle(),

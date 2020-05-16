@@ -135,7 +135,7 @@ public class AchievementsController extends Controller {
                 finalList = finalList.thenCombine(achievementReq, (allAchievements, gameAchievements) -> {
                     List<Achievement> mergedList = new ArrayList<>();
                     for (Achievement a : gameAchievements) {
-                        mergedList.add(a.mergeGame(game));
+                        mergedList.add(a.mergeAch(game));
 //                        a.setGame(game);
                     }
                     allAchievements.addAll(mergedList);
