@@ -56,15 +56,7 @@ public class AchievementsController extends Controller {
                     for (Achievement elem : achievements) {
                         for (Achievement elem2 : schema.getAchievementList()) {
                             if (elem.getApiName().equals(elem2.getApiName())) {
-                                achievementList.add(
-                                        new Achievement(
-                                                elem2.getIconUrl(),
-                                                elem2.getTitle(),
-                                                elem2.getDescription(),
-                                                elem2.getApiName(),
-                                                elem.isAchieved(),
-                                                elem2.getIconUrlGray()
-                                        )
+                                achievementList.add(elem.mergeAch(elem2)
                                 );
                             }
                         }
@@ -79,17 +71,7 @@ public class AchievementsController extends Controller {
                     for (Achievement elem : percent) {
                         for (Achievement elem2 : achievements) {
                             if (elem.getApiName().equals(elem2.getApiName())) {
-                                achievementList.add(
-                                        new Achievement(
-                                                elem2.getIconUrl(),
-                                                elem2.getTitle(),
-                                                elem2.getDescription(),
-                                                elem2.getApiName(),
-                                                elem2.isAchieved(),
-                                                elem2.getIconUrlGray(),
-                                                elem.getPercent()
-                                        )
-                                );
+                                achievementList.add(elem.mergeAch(elem2));
                             }
                         }
                     }
@@ -151,10 +133,12 @@ public class AchievementsController extends Controller {
                 CompletionStage<List<Achievement>> achievementReq = this.achievementsForGame(steamId, game.getId());
 
                 finalList = finalList.thenCombine(achievementReq, (allAchievements, gameAchievements) -> {
+                    List<Achievement> mergedList = new ArrayList<>();
                     for (Achievement a : gameAchievements) {
-                        a.setGame(game);
+                        mergedList.add(a.mergeAch(game));
+//                        a.setGame(game);
                     }
-                    allAchievements.addAll(gameAchievements);
+                    allAchievements.addAll(mergedList);
                     return allAchievements;
                 });
             }

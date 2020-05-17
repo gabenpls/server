@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import logic.NumericUtils;
 import play.libs.Json;
 
+import java.lang.reflect.Field;
 import java.util.*;
 
 public class Achievement {
@@ -12,13 +13,18 @@ public class Achievement {
     private final String title;
     private final String description;
     private final String apiName;
-    private final boolean isAchieved;
+    private final Boolean isAchieved;
     private final String iconUrlGray;
-    private final double percent;
-    private Game game;
+    private final Double percent;
+    private final Game game;
+    private final Integer unlockTime;
 
-    public void setGame(Game game) {
-        this.game = game;
+    public Boolean getAchieved() {
+        return isAchieved;
+    }
+
+    public Integer getUnlockTime() {
+        return unlockTime;
     }
 
     public Game getGame() {
@@ -45,59 +51,16 @@ public class Achievement {
         return iconUrlGray;
     }
 
-    public boolean isAchieved() {
+    public Boolean isAchieved() {
         return isAchieved;
     }
 
-    public double getPercent() {
+    public Double getPercent() {
         return percent;
     }
 
-    public Achievement(String title, String iconUrl, String description, String apiName, String iconUrlGray) {
-        this.iconUrl = iconUrl;
-        this.title = title;
-        this.description = description;
-        this.apiName = apiName;
-        this.iconUrlGray = iconUrlGray;
-
-        this.isAchieved = false;
-        this.percent = 0;
-
-    }
-
-    public Achievement(boolean isAchieved, String apiName) {
-        this.isAchieved = isAchieved;
-        this.apiName = apiName;
-
-        this.iconUrl = null;
-        this.title = null;
-        this.description = null;
-        this.iconUrlGray = null;
-        this.percent = 1;
-    }
-
-    public Achievement(String iconUrl, String title, String description, String apiName, boolean isAchieved, String iconUrlGray) {
-        this.iconUrl = iconUrl;
-        this.title = title;
-        this.description = description;
-        this.apiName = apiName;
-        this.isAchieved = isAchieved;
-        this.iconUrlGray = iconUrlGray;
-        this.percent = 2;
-    }
-
-    public Achievement(String apiName, double percent) {
-        this.apiName = apiName;
-        this.percent = percent;
-
-        this.iconUrl = null;
-        this.title = null;
-        this.description = null;
-        this.isAchieved = false;
-        this.iconUrlGray = null;
-    }
-
-    public Achievement(String iconUrl, String title, String description, String apiName, boolean isAchieved, String iconUrlGray, double percent) {
+    public Achievement(String iconUrl, String title, String description, String apiName, Boolean isAchieved
+            , String iconUrlGray, Double percent, Integer unlockTime, Game game) {
         this.iconUrl = iconUrl;
         this.title = title;
         this.description = description;
@@ -105,7 +68,39 @@ public class Achievement {
         this.isAchieved = isAchieved;
         this.iconUrlGray = iconUrlGray;
         this.percent = percent;
+        this.unlockTime = unlockTime;
+        this.game = game;
     }
+
+    public Achievement mergeAch(Achievement ach) {
+        return new Achievement(
+                this.getIconUrl() != null ? this.getIconUrl() : ach.getIconUrl(),
+                this.getTitle() != null ? this.getTitle() : ach.getTitle(),
+                this.getDescription() != null ? this.getDescription() : ach.getDescription(),
+                this.getApiName() != null ? this.getApiName() : ach.getApiName(),
+                this.isAchieved() != null ? this.isAchieved() : ach.isAchieved(),
+                this.getIconUrlGray() != null ? this.getIconUrlGray() : ach.getIconUrlGray(),
+                this.getPercent() != null ? this.getPercent() : ach.getPercent(),
+                this.getUnlockTime() != null ? this.getUnlockTime() : ach.getUnlockTime(),
+                null
+        );
+    }
+
+
+    public Achievement mergeAch(Game game) {
+        return new Achievement(
+                this.getIconUrl(),
+                this.getTitle(),
+                this.getDescription(),
+                this.getApiName(),
+                this.isAchieved(),
+                this.getIconUrlGray(),
+                this.getPercent(),
+                this.getUnlockTime(),
+                game
+        );
+    }
+
 
     public static Achievement parseFromGameSchema(JsonNode json) {
         String iconUrl = json.get("icon").asText();
@@ -116,7 +111,16 @@ public class Achievement {
         }
         String apiName = json.get("name").asText();
         String iconUrlGray = json.get("icongray").asText();
-        return new Achievement(title, iconUrl, description, apiName, iconUrlGray);
+        return new Achievement(
+                iconUrl,
+                title,
+                description,
+                apiName,
+                null,
+                iconUrlGray,
+                null,
+                null,
+                null);
     }
 
     public static List<Achievement> parseListFromPlayersAchievements(JsonNode json) {
@@ -128,9 +132,24 @@ public class Achievement {
     }
 
     public static Achievement parseFromPlayersAchievements(JsonNode json) {
+//        String iconUrl = null;
+//        String title = null;
+//        String description = null;
         String apiName = json.get("apiname").asText();
-        boolean achieved = json.get("achieved").asBoolean();
-        return new Achievement(achieved, apiName);
+        Boolean isAchieved = json.get("achieved").asBoolean();
+//        String iconUrlGray = null;
+//        Integer unlockTime = null;
+
+        return new Achievement(
+                null,
+                null,
+                null,
+                apiName,
+                isAchieved,
+                null,
+                null,
+                null,
+                null);
 
     }
 
@@ -138,7 +157,16 @@ public class Achievement {
         List<Achievement> result = new ArrayList<>();
         json.get("achievementpercentages").get("achievements").forEach(elem -> {
             double percent = elem.get("percent").asDouble();
-            result.add(new Achievement(elem.get("name").asText(), NumericUtils.round(percent, 2)));
+            result.add(new Achievement(
+                    null,
+                    null,
+                    null,
+                    elem.get("name").asText(),
+                    null,
+                    null,
+                    NumericUtils.round(percent, 2),
+                    null,
+                    null));
         });
         return result;
     }

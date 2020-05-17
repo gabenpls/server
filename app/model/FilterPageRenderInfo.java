@@ -46,9 +46,13 @@ public class FilterPageRenderInfo {
     }
 
     public FilterPageRenderInfo page(int number, int size) {
-        
+        int toIndex = number * size + size;
 
-        List<Achievement> currentPage = this.achievements.subList(number * size, number * size + size);
+        if (this.achievements.size() < toIndex) {
+            toIndex = this.achievements.size();
+        }
+
+        List<Achievement> currentPage = this.achievements.subList(number * size, toIndex);
 
         return new FilterPageRenderInfo(currentPage, this.games);
     }
