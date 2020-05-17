@@ -72,7 +72,7 @@ public class Achievement {
         this.game = game;
     }
 
-    public Achievement mergeAch(Achievement ach) {
+    public Achievement merge(Achievement ach) {
         return new Achievement(
                 this.getIconUrl() != null ? this.getIconUrl() : ach.getIconUrl(),
                 this.getTitle() != null ? this.getTitle() : ach.getTitle(),
@@ -87,7 +87,7 @@ public class Achievement {
     }
 
 
-    public Achievement mergeAch(Game game) {
+    public Achievement merge(Game game) {
         return new Achievement(
                 this.getIconUrl(),
                 this.getTitle(),
@@ -132,14 +132,8 @@ public class Achievement {
     }
 
     public static Achievement parseFromPlayersAchievements(JsonNode json) {
-//        String iconUrl = null;
-//        String title = null;
-//        String description = null;
         String apiName = json.get("apiname").asText();
         Boolean isAchieved = json.get("achieved").asBoolean();
-//        String iconUrlGray = null;
-//        Integer unlockTime = null;
-
         return new Achievement(
                 null,
                 null,

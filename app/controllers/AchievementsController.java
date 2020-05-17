@@ -56,7 +56,7 @@ public class AchievementsController extends Controller {
                     for (Achievement elem : achievements) {
                         for (Achievement elem2 : schema.getAchievementList()) {
                             if (elem.getApiName().equals(elem2.getApiName())) {
-                                achievementList.add(elem.mergeAch(elem2)
+                                achievementList.add(elem.merge(elem2)
                                 );
                             }
                         }
@@ -71,7 +71,7 @@ public class AchievementsController extends Controller {
                     for (Achievement elem : percent) {
                         for (Achievement elem2 : achievements) {
                             if (elem.getApiName().equals(elem2.getApiName())) {
-                                achievementList.add(elem.mergeAch(elem2));
+                                achievementList.add(elem.merge(elem2));
                             }
                         }
                     }
@@ -96,7 +96,7 @@ public class AchievementsController extends Controller {
 
 
         return info
-                .thenApply(i -> i.page(0, 10))
+                .thenApply(i -> i.page(0, 20))
                 .thenApply(i -> ok(views.html.filter_page.render(optAvatar.orElse(null), i.getAchievements(), i.getGames())));
 
     }
@@ -135,8 +135,7 @@ public class AchievementsController extends Controller {
                 finalList = finalList.thenCombine(achievementReq, (allAchievements, gameAchievements) -> {
                     List<Achievement> mergedList = new ArrayList<>();
                     for (Achievement a : gameAchievements) {
-                        mergedList.add(a.mergeAch(game));
-//                        a.setGame(game);
+                        mergedList.add(a.merge(game));
                     }
                     allAchievements.addAll(mergedList);
                     return allAchievements;
