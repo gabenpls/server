@@ -2,6 +2,7 @@ package controllers;
 
 import clients.SteamClient;
 import com.fasterxml.jackson.databind.JsonNode;
+import controllers.actions.LoggingAction;
 import logic.AchievementUtils;
 import logic.ListUtils;
 import model.*;
@@ -10,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
+import play.mvc.With;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
@@ -18,17 +20,14 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
+@With(LoggingAction.class)
 public class AchievementsController extends Controller {
 
     @Inject
     SteamClient steamClient;
 
-    Logger log = LoggerFactory.getLogger("access");
-
 
     public CompletionStage<Result> mainPage(Http.Request request) {
-        log.info("request [{}] received", request.uri());
-        long start = System.currentTimeMillis();
         Optional<String> optSteamId = request.session().get(SteamLoginController.STEAM_ID_NAME);
         Optional<String> optAvatar = request.session().get(SteamLoginController.STEAM_AVATAR_URL_NAME);
         if (optSteamId.isEmpty()) {
@@ -44,15 +43,8 @@ public class AchievementsController extends Controller {
 
 
                     return ok(views.html.achievements.render(optAvatar.orElse(null), rarestAchieved, mostCommonUnAchieved));
-                })
-                .whenComplete((ok, error) -> {
-                    long duration = System.currentTimeMillis() - start;
-                    if (ok != null) {
-                        log.info("request [{}] processed in [{}ms] result is [ok]", request.uri(), duration);
-                    } else {
-                        log.error("request [{}] processed in [{}ms] result is [error]", request.uri(), duration);
-                    }
                 });
+
     }
 
     private CompletionStage<List<Achievement>> achievementsForGame(String steamId, Integer gameId) {
