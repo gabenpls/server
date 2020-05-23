@@ -41,7 +41,6 @@ public class AchievementsController extends Controller {
                     List<Achievement> rarestAchieved = AchievementUtils.rarestAchieved(achievements, 10);
                     List<Achievement> mostCommonUnAchieved = AchievementUtils.mostCommonUnAchieved(achievements, 10);
 
-
                     return ok(views.html.achievements.render(optAvatar.orElse(null), rarestAchieved, mostCommonUnAchieved));
                 });
 

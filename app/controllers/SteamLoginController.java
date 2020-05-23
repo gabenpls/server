@@ -47,7 +47,7 @@ public class SteamLoginController extends Controller {
                     String steamId = parseSteamId(userInfo.id());
                     return steamClient.getPlayerSummaries(steamId).thenApply(playerSummaries -> {
                         String avatarUrl = playerSummaries.getAvatarUrl();
-                        Result response = redirect("/achievements?game_id=440");
+                        Result response = redirect("/achievements");
                         response = response.addingToSession(request, STEAM_ID_NAME, steamId);
                         response = response.addingToSession(request, STEAM_AVATAR_URL_NAME, avatarUrl);
                         return response;
