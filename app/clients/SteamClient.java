@@ -8,16 +8,19 @@ import model.Achievement;
 import model.Game;
 import model.GameSchema;
 import model.PlayerSummaries;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import play.libs.ws.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
 public class SteamClient implements WSBodyReadables, WSBodyWritables {
     private final WSClient ws;
     private static final String STEAM_KEY = "00A01E3C408E32DE20C045C5FCCD944E";
+    Map<Integer, GameSchema> gameSchemaCache = new HashMap<>();
+    Logger log = LoggerFactory.getLogger(this.getClass());
 
     @Inject
     public SteamClient(WSClient ws) {
@@ -56,17 +59,25 @@ public class SteamClient implements WSBodyReadables, WSBodyWritables {
     }
 
     public CompletionStage<GameSchema> getSchemaForGame(Integer gameId) {
-        WSRequest request = ws.url("http://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2/")
-                .addQueryParameter("appid", gameId.toString())
-                .addQueryParameter("key", STEAM_KEY);
-        CompletionStage<WSResponse> responsePromise = request.get();
+        if (gameSchemaCache.containsKey(gameId)) {
+            log.info("cache hit [{}]", gameId);
+            return CompletableFuture.completedFuture(gameSchemaCache.get(gameId));
+        } else {
+            log.info("cache miss [{}]", gameId);
+            WSRequest request = ws.url("http://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2/")
+                    .addQueryParameter("appid", gameId.toString())
+                    .addQueryParameter("key", STEAM_KEY);
+            CompletionStage<WSResponse> responsePromise = request.get();
 
-        return responsePromise.thenApply(response -> {
-            if (response.getStatus() != 200) {
-                error(response);
-            }
-            return GameSchema.parseFrom(response.getBody(json()), gameId);
-        });
+            return responsePromise.thenApply(response -> {
+                if (response.getStatus() != 200) {
+                    error(response);
+                }
+                GameSchema result = GameSchema.parseFrom(response.getBody(json()), gameId);
+                gameSchemaCache.put(gameId, result);
+                return result;
+            });
+        }
     }
 
     public CompletionStage<List<Game>> getPlayerGames(String steamId) {

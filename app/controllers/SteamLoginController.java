@@ -1,6 +1,7 @@
 package controllers;
 
 import clients.SteamClient;
+import controllers.actions.LoggingAction;
 import play.libs.openid.OpenIdClient;
 import play.libs.openid.UserInfo;
 import play.mvc.*;
@@ -9,6 +10,7 @@ import javax.inject.Inject;
 import java.util.Optional;
 import java.util.concurrent.CompletionStage;
 
+@With(LoggingAction.class)
 public class SteamLoginController extends Controller {
 
     public static final String STEAM_ID_NAME = "steam_id";

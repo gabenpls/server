@@ -1,6 +1,7 @@
 package controllers;
 
 import clients.SteamClient;
+import controllers.actions.LoggingAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.mvc.*;
@@ -17,6 +18,7 @@ import java.util.concurrent.CompletionStage;
  * This controller contains an action to handle HTTP requests
  * to the application's home page.
  */
+@With(LoggingAction.class)
 public class HomeController extends Controller {
 
     @Inject
