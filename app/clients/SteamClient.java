@@ -20,6 +20,8 @@ public class SteamClient implements WSBodyReadables, WSBodyWritables {
     private final WSClient ws;
     private static final String STEAM_KEY = "00A01E3C408E32DE20C045C5FCCD944E";
     Map<Integer, GameSchema> gameSchemaCache = new HashMap<>();
+    Map<String, List<Game>> playerGamesCache = new HashMap<>();
+    Map<Integer, List<Achievement>> achievementPercentCache = new HashMap<>();
     Logger log = LoggerFactory.getLogger(this.getClass());
 
     @Inject
@@ -81,32 +83,44 @@ public class SteamClient implements WSBodyReadables, WSBodyWritables {
     }
 
     public CompletionStage<List<Game>> getPlayerGames(String steamId) {
-        WSRequest request = ws.url("http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/")
-                .addQueryParameter("steamid", steamId)
-                .addQueryParameter("key", STEAM_KEY)
-                .addQueryParameter("include_played_free_games", "1")
-                .addQueryParameter("include_appinfo", "1");
-        CompletionStage<WSResponse> responsePromise = request.get();
-        return responsePromise.thenApply(response -> {
-            if (response.getStatus() != 200) {
-                error(response);
-            }
-            return Game.parseListFrom(response.getBody(json()));
-        });
+        if (playerGamesCache.containsKey(steamId)) {
+            return CompletableFuture.completedFuture(playerGamesCache.get(steamId));
+        } else {
+            WSRequest request = ws.url("http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/")
+                    .addQueryParameter("steamid", steamId)
+                    .addQueryParameter("key", STEAM_KEY)
+                    .addQueryParameter("include_played_free_games", "1")
+                    .addQueryParameter("include_appinfo", "1");
+            CompletionStage<WSResponse> responsePromise = request.get();
+            return responsePromise.thenApply(response -> {
+                if (response.getStatus() != 200) {
+                    error(response);
+                }
+                List<Game> result = Game.parseListFrom(response.getBody(json()));
+                playerGamesCache.put(steamId, result);
+                return result;
+            });
+        }
     }
 
     public CompletionStage<List<Achievement>> getAchievementsPercent(Integer gameId) {
-        WSRequest request = ws.url("http://api.steampowered.com/ISteamUserStats/GetGlobalAchievementPercentagesForApp/v0002/")
-                .addQueryParameter("gameid", gameId.toString())
-                .addQueryParameter("format", "json");
+        if (achievementPercentCache.containsKey(gameId)) {
+            return CompletableFuture.completedFuture(achievementPercentCache.get(gameId));
+        } else {
+            WSRequest request = ws.url("http://api.steampowered.com/ISteamUserStats/GetGlobalAchievementPercentagesForApp/v0002/")
+                    .addQueryParameter("gameid", gameId.toString())
+                    .addQueryParameter("format", "json");
 
-        CompletionStage<WSResponse> responsePromise = request.get();
-        return responsePromise.thenApply(response -> {
-            if (response.getStatus() != 200) {
-                error(response);
-            }
-            return Achievement.parseListPercentFrom(response.getBody(json()));
-        });
+            CompletionStage<WSResponse> responsePromise = request.get();
+            return responsePromise.thenApply(response -> {
+                if (response.getStatus() != 200) {
+                    error(response);
+                }
+                List<Achievement> result = Achievement.parseListPercentFrom(response.getBody(json()));
+                achievementPercentCache.put(gameId, result);
+                return result;
+            });
+        }
     }
 
     private void error(WSResponse response) {
@@ -128,30 +142,6 @@ public class SteamClient implements WSBodyReadables, WSBodyWritables {
                 .addQueryParameter("key", STEAM_KEY)
                 .addQueryParameter("steamids", steamId);
         CompletionStage<WSResponse> statusPromise = statusRequest.get();
-
-//        WSRequest gameRequest = ws.url("http://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v0001/")
-//                .addQueryParameter("key", STEAM_KEY)
-//                .addQueryParameter("appid", "440")
-//                .addQueryParameter("steamids", steamId);
-//        CompletionStage<WSResponse> gamePromise = gameRequest.get();
-//
-//        return statusPromise.thenCombine(gamePromise, (status, game) -> {
-//
-//            if (status.getStatus() != 200) {
-//                error(status);
-//            }
-//
-//            int visibleParam = status.getBody(json())
-//                    .get("response")
-//                    .get("players")
-//                    .get(0)
-//                    .get("communityvisibilitystate").asInt();
-//
-//
-//            return visibleParam == 3 && game.getStatus() == 200;
-//        });
-
-
         return statusPromise.thenApply(response -> {
             if (response.getStatus() != 200) {
                 error(response);
