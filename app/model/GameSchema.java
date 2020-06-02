@@ -1,5 +1,6 @@
 package model;
 
+import cache.Key;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import java.util.ArrayList;
@@ -45,5 +46,11 @@ public class GameSchema {
             }
         }
         return new GameSchema(id, name, achievementList);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        GameSchema otherGame = (GameSchema) obj;
+        return otherGame.equals(this);
     }
 }

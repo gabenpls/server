@@ -1,5 +1,6 @@
 package controllers;
 
+import clients.CachedSteamClient;
 import clients.SteamClient;
 import com.fasterxml.jackson.databind.JsonNode;
 import controllers.actions.LoggingAction;
@@ -24,7 +25,7 @@ import java.util.concurrent.CompletionStage;
 public class AchievementsController extends Controller {
 
     @Inject
-    SteamClient steamClient;
+    CachedSteamClient steamClient;
 
 
     public CompletionStage<Result> mainPage(Http.Request request) {
