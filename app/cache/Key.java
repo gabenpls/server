@@ -3,20 +3,13 @@ package cache;
 public class Key {
 
     private final Object key;
-    private final Long lifeTime;
 
     public Object getKey() {
         return key;
     }
 
-    public Key(Object key, Long ttl) {
+    public Key(Object key) {
         this.key = key;
-        this.lifeTime = System.currentTimeMillis() + ttl;
-    }
-
-
-    public boolean isLive() {
-        return System.currentTimeMillis() < lifeTime;
     }
 
     @Override
