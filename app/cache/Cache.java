@@ -6,32 +6,34 @@ import java.util.Map;
 public class Cache<K, V> {
 
     private final Long TTL;
-    private Map<Key, V> cacheMap = new HashMap<>();
+    private Map<K, Value<V>> cacheMap = new HashMap<>();
 
     public Cache(Long TTL) {
         this.TTL = TTL;
     }
 
     public void put(K key, V value) {
-        cacheMap.put(new Key(key, TTL + System.currentTimeMillis()), value);
+        cacheMap.put(key, new Value<V>(value, TTL));
     }
 
     public boolean contains(K key) {
-        Long expTime = 0L;
-        Key correctKey = new Key(1, 1L);
-        for (Key k : cacheMap.keySet()) {
-            if (k.isCorrect(key)) {
-                correctKey = k;
-                System.out.println("expT " + correctKey.getExpiredTime());
+        Value<V> elem = cacheMap.get(key);
+        if (elem == null) {
+            return false;
+        } else {
+            if (elem.isAlive()) {
+                return true;
+            } else {
+                cacheMap.remove(key);
+                return false;
             }
         }
-        System.out.println(cacheMap.containsKey(correctKey));
-        return System.currentTimeMillis() < correctKey.getExpiredTime() && cacheMap.containsKey(correctKey);
     }
 
 
     public V get(K key) {
-        return cacheMap.get(key);
+        Value<V> elem = cacheMap.get(key);
+        return elem == null ? null : elem.getValue();
     }
 
 }

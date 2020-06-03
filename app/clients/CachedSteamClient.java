@@ -1,19 +1,16 @@
 package clients;
 
 import cache.Cache;
-import cache.Key;
 import model.GameSchema;
 import play.libs.ws.WSClient;
 
 import javax.inject.Inject;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
 public class CachedSteamClient extends SteamClient {
 
-    Cache<Integer, GameSchema> schemaCache = new Cache<>(10000000000L);
+    Cache<Integer, GameSchema> schemaCache = new Cache<>(1000L * 10);
 
     @Inject
     public CachedSteamClient(WSClient ws) {
