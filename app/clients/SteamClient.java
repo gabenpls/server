@@ -2,7 +2,6 @@ package clients;
 
 import javax.inject.Inject;
 
-import cache.Key;
 import com.fasterxml.jackson.databind.JsonNode;
 import model.Achievement;
 import model.Game;
