@@ -13,7 +13,7 @@ import java.util.concurrent.CompletionStage;
 
 public class CachedSteamClient extends SteamClient {
 
-    Cache<Integer, GameSchema> schemaCache = new Cache<>(86400000L);
+    Cache<Integer, GameSchema> schemaCache = new Cache<>(10000000000L);
 
     @Inject
     public CachedSteamClient(WSClient ws) {
