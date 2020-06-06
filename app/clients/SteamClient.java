@@ -2,6 +2,7 @@ package clients;
 
 import javax.inject.Inject;
 
+import akka.event.LoggingFilter;
 import com.fasterxml.jackson.databind.JsonNode;
 import model.Achievement;
 import model.Game;
@@ -18,8 +19,7 @@ import java.util.concurrent.CompletionStage;
 public class SteamClient implements WSBodyReadables, WSBodyWritables {
     private final WSClient ws;
     private static final String STEAM_KEY = "00A01E3C408E32DE20C045C5FCCD944E";
-
-    Map<String, List<Game>> playerGamesCache = new HashMap<>();
+    private final LoggingWSFilter loggingFilter = new LoggingWSFilter();
     Logger log = LoggerFactory.getLogger(this.getClass());
 
     @Inject
@@ -30,7 +30,8 @@ public class SteamClient implements WSBodyReadables, WSBodyWritables {
     public CompletionStage<PlayerSummaries> getPlayerSummaries(String steamId) {
         WSRequest request = ws.url("http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/")
                 .addQueryParameter("key", STEAM_KEY)
-                .addQueryParameter("steamids", steamId);
+                .addQueryParameter("steamids", steamId)
+                .setRequestFilter(loggingFilter);
         CompletionStage<WSResponse> responsePromise = request.get();
 
         return responsePromise.thenApply(response -> {
@@ -47,7 +48,8 @@ public class SteamClient implements WSBodyReadables, WSBodyWritables {
         WSRequest request = ws.url("http://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v0001/")
                 .addQueryParameter("appid", gameId.toString())
                 .addQueryParameter("key", STEAM_KEY)
-                .addQueryParameter("steamid", steamId);
+                .addQueryParameter("steamid", steamId)
+                .setRequestFilter(loggingFilter);
         CompletionStage<WSResponse> responsePromise = request.get();
 
         return responsePromise.thenApply(response -> {
@@ -61,7 +63,8 @@ public class SteamClient implements WSBodyReadables, WSBodyWritables {
     public CompletionStage<GameSchema> getSchemaForGame(Integer gameId) {
         WSRequest request = ws.url("http://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2/")
                 .addQueryParameter("appid", gameId.toString())
-                .addQueryParameter("key", STEAM_KEY);
+                .addQueryParameter("key", STEAM_KEY)
+                .setRequestFilter(loggingFilter);
         CompletionStage<WSResponse> responsePromise = request.get();
 
         return responsePromise.thenApply(response -> {
@@ -78,7 +81,8 @@ public class SteamClient implements WSBodyReadables, WSBodyWritables {
                 .addQueryParameter("steamid", steamId)
                 .addQueryParameter("key", STEAM_KEY)
                 .addQueryParameter("include_played_free_games", "1")
-                .addQueryParameter("include_appinfo", "1");
+                .addQueryParameter("include_appinfo", "1")
+                .setRequestFilter(loggingFilter);
         CompletionStage<WSResponse> responsePromise = request.get();
 
         return responsePromise.thenApply(response -> {
@@ -93,7 +97,8 @@ public class SteamClient implements WSBodyReadables, WSBodyWritables {
     public CompletionStage<List<Achievement>> getAchievementsPercent(Integer gameId) {
         WSRequest request = ws.url("http://api.steampowered.com/ISteamUserStats/GetGlobalAchievementPercentagesForApp/v0002/")
                 .addQueryParameter("gameid", gameId.toString())
-                .addQueryParameter("format", "json");
+                .addQueryParameter("format", "json")
+                .setRequestFilter(loggingFilter);
 
         CompletionStage<WSResponse> responsePromise = request.get();
         return responsePromise.thenApply(response -> {
@@ -121,7 +126,8 @@ public class SteamClient implements WSBodyReadables, WSBodyWritables {
     public CompletionStage<Boolean> isVisible(String steamId) {
         WSRequest statusRequest = ws.url("http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/")
                 .addQueryParameter("key", STEAM_KEY)
-                .addQueryParameter("steamids", steamId);
+                .addQueryParameter("steamids", steamId)
+                .setRequestFilter(loggingFilter);
         CompletionStage<WSResponse> statusPromise = statusRequest.get();
         return statusPromise.thenApply(response -> {
             if (response.getStatus() != 200) {

@@ -41,10 +41,10 @@ public class CachedSteamClient extends SteamClient {
     public CompletionStage<GameSchema> getSchemaForGame(Integer gameId) {
         GameSchema cachedSchema = schemaCache.getIfPresent(gameId);
         if (cachedSchema != null) {
-            log.info("schema cache hit [{}]", gameId);
+            //log.info("schema cache hit [{}]", gameId);
             return CompletableFuture.completedFuture(cachedSchema);
         } else {
-            log.info("schema cache miss [{}]", gameId);
+            //log.info("schema cache miss [{}]", gameId);
 
             return super.getSchemaForGame(gameId).whenComplete((schema, error) -> {
                 if (error == null) {
@@ -58,10 +58,10 @@ public class CachedSteamClient extends SteamClient {
     public CompletionStage<List<Game>> getPlayerGames(String steamId) {
         List<Game> cachedList = playersGamesCache.getIfPresent(steamId);
         if (cachedList != null) {
-            log.info("playerGames cache hit [{}]", steamId);
+            //log.info("playerGames cache hit [{}]", steamId);
             return CompletableFuture.completedFuture(cachedList);
         } else {
-            log.info("playerGames cache miss [{}]", steamId);
+            //log.info("playerGames cache miss [{}]", steamId);
             return super.getPlayerGames(steamId).whenComplete((games, error) -> {
                 if (error == null) {
                     playersGamesCache.put(steamId, games);
@@ -74,10 +74,10 @@ public class CachedSteamClient extends SteamClient {
     public CompletionStage<List<Achievement>> getAchievementsPercent(Integer gameId) {
         List<Achievement> cachedList = achievementPercentCache.getIfPresent(gameId);
         if (cachedList != null) {
-            log.info("achievementPercent cache hit [{}]", gameId);
+            //log.info("achievementPercent cache hit [{}]", gameId);
             return CompletableFuture.completedFuture(cachedList);
         } else {
-            log.info("achievementPercent cache miss [{}]", gameId);
+            //log.info("achievementPercent cache miss [{}]", gameId);
             return super.getAchievementsPercent(gameId).whenComplete((percent, error) -> {
                 if (error == null) {
                     achievementPercentCache.put(gameId, percent);

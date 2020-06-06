@@ -21,7 +21,7 @@ public class LoggingAction extends play.mvc.Action.Simple {
         return delegate.call(req).whenComplete((response, error) -> {
             int status = response != null ? response.status() : 500;
             long duration = System.currentTimeMillis() - start;
-            log.info("[{}] [{}] [{}] [{} {}] [{}] [{}ms] ", req.id(), ip, steamId, req.method(), req.uri(), status, duration);
+            log.info("[INCOMMING] [{}] [{}] [{}] [{} {}] [{}] [{}ms] ", req.id(), ip, steamId, req.method(), req.uri(), status, duration);
         });
     }
 }
