@@ -100,7 +100,7 @@ public class AchievementsController extends Controller {
         String steamId = optSteamId.get();
 
         CompletionStage<FilterPageRenderInfo> info = getAllPlayerAchievements(steamId);
-
+        //.thenApply(FilterPageRenderInfo::gamesWithAchievements);
 
         return info
                 .thenApply(i -> i.page(0, 20))
@@ -120,6 +120,7 @@ public class AchievementsController extends Controller {
 
         JsonNode node = request.body().asJson();
         Filter filter = Filter.parseFrom(node);
+        System.out.println("                                         Filters " + filter.getGameIds());
 
         return pageInfoPromise.thenApply(info -> {
             List<Achievement> filteredAch = ListUtils.filter(info.getAchievements(), ach -> {
@@ -133,9 +134,11 @@ public class AchievementsController extends Controller {
     private CompletionStage<FilterPageRenderInfo> getAllPlayerAchievements(String steamId) {
 
         CompletionStage<List<Game>> ownedGamesPromise = steamClient.getPlayerGames(steamId);
+
         CompletionStage<List<Achievement>> achievementListPromise = ownedGamesPromise.thenCompose(games -> {
 
             CompletionStage<List<Achievement>> finalList = CompletableFuture.completedFuture(new ArrayList<>());
+
             for (Game game : games) {
                 CompletionStage<List<Achievement>> achievementReq = this.achievementsForGame(steamId, game.getId());
 

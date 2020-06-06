@@ -2,6 +2,7 @@ package cache;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.*;
 
 public class Cache<K, V> {
 
@@ -16,7 +17,7 @@ public class Cache<K, V> {
         cacheMap.put(key, new Value<V>(value, TTL));
     }
 
-    public boolean contains(K key) {
+    private boolean contains(K key) {
         Value<V> elem = cacheMap.get(key);
         if (elem == null) {
             return false;
@@ -30,10 +31,13 @@ public class Cache<K, V> {
         }
     }
 
-
-    public V get(K key) {
-        Value<V> elem = cacheMap.get(key);
-        return elem == null ? null : elem.getValue();
+    public synchronized V getIfContains(K key) {
+        if (contains(key)) {
+            Value<V> elem = cacheMap.get(key);
+            return elem == null ? null : elem.getValue();
+        } else {
+            return null;
+        }
     }
 
 }

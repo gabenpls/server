@@ -12,7 +12,8 @@ javacOptions ++= Seq("-source", "11", "-target", "11")
 libraryDependencies ++= Seq(
   guice,
   openId,
-  javaWs
+  javaWs,
+  caffeine
 )
 
 maintainer in Linux := "Maxim Gribov <mcsim1993@gmail.com>"

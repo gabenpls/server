@@ -1,6 +1,7 @@
 package clients;
 
-import cache.Cache;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import model.Achievement;
 import model.Game;
 import model.GameSchema;
@@ -10,12 +11,26 @@ import javax.inject.Inject;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
+import java.util.concurrent.TimeUnit;
 
 public class CachedSteamClient extends SteamClient {
 
-    Cache<Integer, GameSchema> schemaCache = new Cache<>(1000L * 60);
-    Cache<String, List<Game>> playersGamesCache = new Cache<>(1000L * 60);
-    Cache<Integer, List<Achievement>> achievementPercentCache = new Cache<>(1000L * 60);
+
+    Cache<Integer, GameSchema> schemaCache = Caffeine.newBuilder()
+            .expireAfterWrite(1L, TimeUnit.DAYS)
+            .maximumSize(1000)
+            .build();
+
+    Cache<String, List<Game>> playersGamesCache = Caffeine.newBuilder()
+            .expireAfterWrite(5L, TimeUnit.MINUTES)
+            .maximumSize(1000)
+            .build();
+
+    Cache<Integer, List<Achievement>> achievementPercentCache = Caffeine.newBuilder()
+            .expireAfterWrite(1L, TimeUnit.HOURS)
+            .maximumSize(1000)
+            .build();
+
 
     @Inject
     public CachedSteamClient(WSClient ws) {
@@ -24,11 +39,10 @@ public class CachedSteamClient extends SteamClient {
 
     @Override
     public CompletionStage<GameSchema> getSchemaForGame(Integer gameId) {
-
-        if (schemaCache.contains(gameId)) {
+        GameSchema cachedSchema = schemaCache.getIfPresent(gameId);
+        if (cachedSchema != null) {
             log.info("schema cache hit [{}]", gameId);
-
-            return CompletableFuture.completedFuture(schemaCache.get(gameId));
+            return CompletableFuture.completedFuture(cachedSchema);
         } else {
             log.info("schema cache miss [{}]", gameId);
 
@@ -42,14 +56,12 @@ public class CachedSteamClient extends SteamClient {
 
     @Override
     public CompletionStage<List<Game>> getPlayerGames(String steamId) {
-
-        if (playersGamesCache.contains(steamId)) {
+        List<Game> cachedList = playersGamesCache.getIfPresent(steamId);
+        if (cachedList != null) {
             log.info("playerGames cache hit [{}]", steamId);
-
-            return CompletableFuture.completedFuture(playersGamesCache.get(steamId));
+            return CompletableFuture.completedFuture(cachedList);
         } else {
             log.info("playerGames cache miss [{}]", steamId);
-
             return super.getPlayerGames(steamId).whenComplete((games, error) -> {
                 if (error == null) {
                     playersGamesCache.put(steamId, games);
@@ -60,13 +72,12 @@ public class CachedSteamClient extends SteamClient {
 
     @Override
     public CompletionStage<List<Achievement>> getAchievementsPercent(Integer gameId) {
-        if (achievementPercentCache.contains(gameId)) {
+        List<Achievement> cachedList = achievementPercentCache.getIfPresent(gameId);
+        if (cachedList != null) {
             log.info("achievementPercent cache hit [{}]", gameId);
-
-            return CompletableFuture.completedFuture(achievementPercentCache.get(gameId));
+            return CompletableFuture.completedFuture(cachedList);
         } else {
             log.info("achievementPercent cache miss [{}]", gameId);
-
             return super.getAchievementsPercent(gameId).whenComplete((percent, error) -> {
                 if (error == null) {
                     achievementPercentCache.put(gameId, percent);

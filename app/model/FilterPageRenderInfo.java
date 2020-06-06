@@ -56,4 +56,15 @@ public class FilterPageRenderInfo {
 
         return new FilterPageRenderInfo(currentPage, this.games);
     }
+
+    public FilterPageRenderInfo gamesWithAchievements() {
+        for (Achievement a : this.getAchievements()) {
+            if (a.getDescription() == null) {
+                this.getGames().remove(a.getGame());
+                this.getAchievements().remove(a);
+            }
+
+        }
+        return new FilterPageRenderInfo(this.getAchievements(), this.getGames());
+    }
 }
