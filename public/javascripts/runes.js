@@ -1,21 +1,38 @@
-var alarmSound = new Audio();
-var sec = 0;
-alarmSound.src = "/assets/sounds/John_Cena.mp3"
+var runesSound = new Audio();
+var roshSound = new Audio();
 
-function setAlarm() {
-    setInterval(initAlarm, 5000);
-setInterval( function(){
-        $("#seconds").html(pad(++sec%60));
-        $("#minutes").html(pad(parseInt(sec/60,10)));
-    }, 1000);
-}
-function initAlarm(){
-    alarmSound.play();
+
+runesSound.src = "/assets/sounds/John_Cena.mp3"
+
+roshSound.src = "/assets/sounds/roshan.mp3"
+
+function setRunesAlarm() {
+    sleep(60000);
+    setInterval(initRunesAlarm, 240000);
 }
 
-function pad ( val ) {
- return val > 9 ? val : "0" + val;
- }
+function setRoshAlarm() {
+    setTimeout(initRoshAlarm, 300000);
+    setTimeout(initRoshAlarm, 180000);
+    setTimeout(initRoshAlarm, 120000);
+}
+
+function initRunesAlarm(){
+    runesSound.play();
+}
+
+function initRoshAlarm(){
+    roshSound.play();
+}
+
+function sleep(milliseconds) {
+  const date = Date.now();
+  let currentDate = null;
+  do {
+    currentDate = Date.now();
+  } while (currentDate - date < milliseconds);
+}
+
 
 
 
