@@ -1,6 +1,6 @@
 var runesSound = new Audio();
 var roshSound = new Audio();
-
+var myTimeout;
 
 runesSound.src = "/assets/sounds/John_Cena.mp3"
 
@@ -12,9 +12,10 @@ function setRunesAlarm() {
 }
 
 function setRoshAlarm() {
-    setTimeout(initRoshAlarm, 300000);
-    setTimeout(initRoshAlarm, 180000);
-    setTimeout(initRoshAlarm, 120000);
+    clearTimeout(myTimeout);
+    myTimeout = setTimeout(() => {roshSound.play()}, 300000);
+    myTimeout = setTimeout(() => {roshSound.play()}, 540000);
+    myTimeout = setTimeout(() => {roshSound.play()}, 600000);
 }
 
 function initRunesAlarm(){
